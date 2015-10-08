@@ -152,24 +152,54 @@ class Batch
         DB::query($sql);
     }
 
-    public function delete($className, $ids)
+    public function delete($dataObjects)
     {
-        $this->deleteTablePrefix($className, $ids);
+        $types = array();
+
+        foreach ($dataObjects as $dataObject) {
+            $types[$dataObject->ClassName][] = $dataObject->ID;
+        }
+
+        foreach ($types as $className => $ids) {
+            $this->deleteTablePostfix($className, $ids);
+        }
     }
 
-    public function deleteFromStage($className, $ids)
+    public function deleteIDs($className, $ids)
+    {
+        $this->deleteTablePostfix($className, $ids);
+    }
+
+    public function deleteFromStage($dataObjects)
+    {
+        $stages = array_slice(func_get_args(), 1);
+
+        $types = array();
+
+        foreach ($dataObjects as $dataObject) {
+            $types[$dataObject->ClassName][] = $dataObject->ID;
+        }
+
+        foreach ($types as $className => $ids) {
+            foreach ($stages as $stage) {
+                $this->deleteTablePostfix($className, $ids, $stage);
+            }
+        }
+    }
+
+    public function deleteIDsFromStage($className, $ids)
     {
         $stages = array_slice(func_get_args(), 2);
 
         foreach ($stages as $stage) {
-            $this->deleteTablePrefix($className, $ids, $stage);
+            $this->deleteTablePostfix($className, $ids, $stage);
         }
     }
 
-    private function deleteTablePrefix($className, $ids, $prefix = '')
+    private function deleteTablePostfix($className, $ids, $postfix = '')
     {
-        if ($prefix === 'Stage') {
-            $prefix = '';
+        if ($postfix === 'Stage') {
+            $postfix = '';
         }
 
         $singleton = singleton($className);
@@ -179,11 +209,12 @@ class Batch
 
         $field = DBField::create_field('Int', null, 'ID');
         $ids = '(' . implode(', ', array_map(function ($id) use ($field) {
+                $id = $id instanceof \DataObject ? $id->ID : $id;
                 return $field->prepValueForDB($id);
             }, $ids)) . ')';
 
         foreach ($ancestry as $class) {
-            $table = $class . ($prefix ? '_' . $prefix : '');
+            $table = $class . ($postfix ? '_' . $postfix : '');
             $sql = "DELETE FROM `{$table}` WHERE ID IN {$ids}";
             DB::query($sql);
         }
