@@ -151,4 +151,41 @@ class Batch
 
         DB::query($sql);
     }
+
+    public function delete($className, $ids)
+    {
+        $this->deleteTablePrefix($className, $ids);
+    }
+
+    public function deleteFromStage($className, $ids)
+    {
+        $stages = array_slice(func_get_args(), 2);
+
+        foreach ($stages as $stage) {
+            $this->deleteTablePrefix($className, $ids, $stage);
+        }
+    }
+
+    private function deleteTablePrefix($className, $ids, $prefix = '')
+    {
+        if ($prefix === 'Stage') {
+            $prefix = '';
+        }
+
+        $singleton = singleton($className);
+        $ancestry = array_reverse(array_filter($singleton->getClassAncestry(), function ($class) {
+            return DataObject::has_own_table($class);
+        }));
+
+        $field = DBField::create_field('Int', null, 'ID');
+        $ids = '(' . implode(', ', array_map(function ($id) use ($field) {
+                return $field->prepValueForDB($id);
+            }, $ids)) . ')';
+
+        foreach ($ancestry as $class) {
+            $table = $class . ($prefix ? '_' . $prefix : '');
+            $sql = "DELETE FROM `{$table}` WHERE ID IN {$ids}";
+            DB::query($sql);
+        }
+    }
 }
