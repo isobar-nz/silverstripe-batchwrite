@@ -1,0 +1,21 @@
+{
+  "name": "chrisahhh/bratchwrite",
+  "description": "Batch write for silverstripe data objects",
+  "type": "silverstripe-module",
+  "homepage": "http://github.com/chrisahhh/silverstripe-batchwrite",
+  "keywords": ["silverstripe", "batch", "performance"],
+  "license": "BSD-2-Clause",
+  "authors": [
+    {"name": "Christopher Barrett","email": "christopherwalkerbarrett@gmail.com"}
+  ],
+  "support": {
+    "issues": "http://github.com/chrisahhh/silverstripe-batchwrite/issues"
+  },
+  "require": {
+    "silverstripe/cms": ">=3.0",
+    "silverstripe/framework": ">=3.0"
+  },
+  "extra": {
+    "installer-name": "bratchwrite"
+  }
+}
