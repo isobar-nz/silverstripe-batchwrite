@@ -1,5 +1,5 @@
 {
-  "name": "chrisahhh/bratchwrite",
+  "name": "chrisahhh/batchwrite",
   "description": "Batch write for silverstripe data objects",
   "type": "silverstripe-module",
   "homepage": "http://github.com/chrisahhh/silverstripe-batchwrite",
@@ -16,6 +16,6 @@
     "silverstripe/framework": ">=3.0"
   },
   "extra": {
-    "installer-name": "bratchwrite"
+    "installer-name": "batchwrite"
   }
 }
