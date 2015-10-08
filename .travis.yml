@@ -1,5 +1,5 @@
-language: php 
-php: 
+language: php
+php:
  - 5.3
 
 env:
@@ -21,6 +21,6 @@ before_script:
  - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
  - cd ~/builds/ss
 
-script: 
- - vendor/bin/phpunit <module-name>/tests/
+script:
+ - vendor/bin/phpunit batchwrite/tests/
 
