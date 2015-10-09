@@ -4,11 +4,19 @@ class Batch
 {
     public function write($dataObjects)
     {
+        if (empty($dataObjects)) {
+            return;
+        }
+
         return $this->writeTablePostfix($dataObjects);
     }
 
     public function writeToStage($dataObjects)
     {
+        if (empty($dataObjects)) {
+            return;
+        }
+
         $stages = func_get_args();
         array_shift($stages);
 
@@ -152,6 +160,54 @@ class Batch
         DB::query($sql);
     }
 
+    public function writeManyMany($sets)
+    {
+        if (empty($sets)) {
+            return;
+        }
+
+        $types = array();
+
+        foreach ($sets as $set) {
+            $types[$set[0]->ClassName][$set[1]][] = $set;
+        }
+
+        foreach ($types as $className => $relations) {
+            foreach ($relations as $relation => $sets) {
+                $tableName = $className . '_' . $relation;
+
+//                $extraFields = $object->many_many_ExtraFields($relation);
+
+                $columnNames = array($className . 'ID', $sets[0][2]->ClassName . 'ID');
+
+                $values = array();
+
+                foreach ($sets as $set) {
+                    $rowValues = array(
+                        $set[0]->dbObject('ID')->prepValueForDB($set[0]->ID),
+                        $set[2]->dbObject('ID')->prepValueForDB($set[2]->ID),
+                    );
+
+                    // todo extra fields
+
+                    $values[] = $rowValues;
+                }
+
+                $columns = implode(', ', array_map(function ($name) {
+                    return "`{$name}`";
+                }, $columnNames));
+
+                $values = implode(', ', array_map(function ($objectValues) {
+                    return '(' . implode(', ', $objectValues) . ')';
+                }, $values));
+
+                $sql = "INSERT INTO `{$tableName}` ({$columns}) VALUES {$values}";
+
+                DB::query($sql);
+            }
+        }
+    }
+
     public function delete($dataObjects)
     {
         $types = array();
@@ -198,6 +254,10 @@ class Batch
 
     private function deleteTablePostfix($className, $ids, $postfix = '')
     {
+        if (empty($ids)) {
+            return;
+        }
+
         if ($postfix === 'Stage') {
             $postfix = '';
         }
