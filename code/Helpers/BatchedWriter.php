@@ -12,6 +12,9 @@ class BatchedWriter
     private $stagedBatchLookup = array();
     private $stagedBatchSearch = array();
 
+    private $deleteBatches = array();
+    private $stagedDeleteBatches = array();
+
     private $manyManyBatches = array();
 
     public function __construct($batchSize = 100)
@@ -58,7 +61,7 @@ class BatchedWriter
         }
     }
 
-    public function writeToStage($dataObjects)
+    public function writeToStage($dataObjects, $stage)
     {
         $stages = array_slice(func_get_args(), 1);
 
@@ -119,14 +122,80 @@ class BatchedWriter
         }
     }
 
-    public function delete($object)
+    public function delete($objects)
     {
+        foreach ($objects as $object) {
+            $className = $object->ClassName;
+            $this->deleteBatches[$className][] = $object->ID;
+            if (count($this->deleteBatches[$className]) >= $this->batchSize) {
+                $this->batch->deleteIDs($className, $this->deleteBatches[$className]);
+                unset($this->deleteBatches[$className]);
+            }
+        }
+    }
 
+    public function deleteIDs($className, $ids)
+    {
+        if (!isset($this->deleteBatches[$className])) {
+            $this->deleteBatches[$className] = $ids;
+        } else {
+            $this->deleteBatches[$className] = array_merge($this->deleteBatches[$className], $ids);
+        }
+        if (count($this->deleteBatches[$className]) >= $this->batchSize) {
+            $this->batch->deleteIDs($className, $this->deleteBatches[$className]);
+            unset($this->deleteBatches[$className]);
+        }
+    }
+
+    public function deleteFromStage($objects, $stage)
+    {
+        $stages = array_slice(func_get_args(), 1);
+
+        foreach ($stages as $stage) {
+            foreach ($objects as $object) {
+                $className = $object->ClassName;
+                $this->stagedDeleteBatches[$stage][$className][] = $object->ID;
+                if (count($this->stagedDeleteBatches[$stage][$className]) >= $this->batchSize) {
+                    $this->batch->deleteIDsFromStage($className, $this->stagedDeleteBatches[$stage][$className], $stage);
+
+                    unset($this->stagedDeleteBatches[$stage][$className]);
+                    if ($this->stagedDeleteBatches[$stage]) {
+                        unset($this->stagedDeleteBatches[$stage]);
+                    }
+                }
+            }
+        }
+    }
+
+    public function deleteIDsFromStage($className, $ids, $stage)
+    {
+        $stages = array_slice(func_get_args(), 2);
+
+        foreach ($stages as $stage) {
+            if (!isset($this->stagedDeleteBatches[$stage][$className])) {
+                $this->stagedDeleteBatches[$stage][$className] = $ids;
+            } else {
+                $this->stagedDeleteBatches[$stage][$className] = array_merge($this->stagedDeleteBatches[$stage][$className], $ids);
+            }
+            if (count($this->stagedDeleteBatches[$className]) >= $this->batchSize) {
+                $this->batch->deleteIDsFromStage($className, $this->stagedDeleteBatches[$stage][$className], $stage);
+
+                unset($this->stagedDeleteBatches[$stage][$className]);
+                if ($this->stagedDeleteBatches[$stage]) {
+                    unset($this->stagedDeleteBatches[$stage]);
+                }
+            }
+        }
     }
 
     public function finish()
     {
-        while (!empty($this->batches) || !empty($this->stagedBatches) || !empty($this->manyManyBatches)) {
+        while (!empty($this->batches)
+            || !empty($this->stagedBatches)
+            || !empty($this->manyManyBatches)
+            || !empty($this->deleteBatches)
+            || !empty($this->stagedDeleteBatches)
+        ) {
             foreach ($this->batches as $className => $objects) {
                 $this->batch->write($objects);
                 unset($this->batches[$className]);
@@ -152,6 +221,18 @@ class BatchedWriter
                 }
                 unset($this->manyManyBatches[$className]);
             }
+
+            foreach ($this->deleteBatches as $className => $ids) {
+                $this->batch->deleteIDs($className, $ids);
+            }
+            $this->deleteBatches = array();
+
+            foreach ($this->stagedDeleteBatches as $stage => $classNames) {
+                foreach ($classNames as $className => $ids) {
+                    $this->batch->deleteIDsFromStage($className, $ids, $stage);
+                }
+            }
+            $this->stagedDeleteBatches = array();
         }
     }
 }

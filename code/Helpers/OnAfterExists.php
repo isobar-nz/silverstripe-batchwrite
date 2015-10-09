@@ -19,7 +19,7 @@ class OnAfterExists
         }
 
         foreach ($objects as $object) {
-        $this->objects->add($object);
+            $this->objects->add($object);
 
             $everyObject = $this->objects;
             $existsCallback = $this->callback;
@@ -30,7 +30,10 @@ class OnAfterExists
 
                 $exists = true;
                 foreach ($everyObject as $object) {
-                    $exists = $exists && $object->exists();
+                    if (!$object->exists()) {
+                        $exists = false;
+                        break;
+                    }
                 }
 
                 if ($exists) {
