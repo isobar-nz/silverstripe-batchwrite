@@ -256,7 +256,11 @@ class Batch
             $manyMany = $singleton->many_many();
 
             if (isset($manyMany[$relation])) {
-                $relationFields = array($parentClass . '_' . $relation, $parentClass . 'ID', $manyMany[$relation] . 'ID');
+                $belongsClass = $manyMany[$relation];
+                if ($belongsClass ===  $parentClass) {
+                    $belongsClass = 'Child';
+                }
+                $relationFields = array($parentClass . '_' . $relation, $parentClass . 'ID', $belongsClass . 'ID');
                 $this->relations[$parent->class][$relation] = $relationFields;
                 return $relationFields;
             }

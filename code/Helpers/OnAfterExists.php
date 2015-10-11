@@ -17,6 +17,11 @@ class OnAfterExists
         $this->dataObjectRecordProperty->setAccessible(true);
     }
 
+    public function count()
+    {
+        return count($this->objects);
+    }
+
     public function addCondition($objects, callable $callback = null)
     {
         if ($objects instanceof DataObject) {

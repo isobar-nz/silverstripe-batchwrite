@@ -156,6 +156,10 @@ class BatchedWriter
 
     public function deleteIDs($className, $ids)
     {
+        if (!is_array($ids)) {
+            $ids = array($ids);
+        }
+
         if (!isset($this->deleteBatches[$className])) {
             $this->deleteBatches[$className] = $ids;
         } else {
@@ -196,13 +200,17 @@ class BatchedWriter
     {
         $stages = array_slice(func_get_args(), 2);
 
+        if (!is_array($ids)) {
+            $ids = array($ids);
+        }
+
         foreach ($stages as $stage) {
-            if (!isset($this->stagedDeleteBatches[$stage][$className])) {
+            if (empty($this->stagedDeleteBatches[$stage][$className])) {
                 $this->stagedDeleteBatches[$stage][$className] = $ids;
             } else {
                 $this->stagedDeleteBatches[$stage][$className] = array_merge($this->stagedDeleteBatches[$stage][$className], $ids);
             }
-            if (count($this->stagedDeleteBatches[$className]) >= $this->batchSize) {
+            if (count($this->stagedDeleteBatches[$stage][$className]) >= $this->batchSize) {
                 $this->batch->deleteIDsFromStage($className, $this->stagedDeleteBatches[$stage][$className], $stage);
 
                 unset($this->stagedDeleteBatches[$stage][$className]);
