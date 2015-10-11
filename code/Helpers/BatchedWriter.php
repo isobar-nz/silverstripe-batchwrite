@@ -17,10 +17,15 @@ class BatchedWriter
 
     private $manyManyBatches = array();
 
+    private $dataObjectRecordProperty;
+
     public function __construct($batchSize = 100)
     {
         $this->batch = new Batch();
         $this->batchSize = $batchSize;
+
+        $this->dataObjectRecordProperty = new ReflectionProperty('DataObject', 'record');
+        $this->dataObjectRecordProperty->setAccessible(true);
     }
 
     public function write($dataObjects)
@@ -30,12 +35,12 @@ class BatchedWriter
         }
 
         foreach ($dataObjects as $object) {
-            $className = $object->ClassName;
+            $className = $object->class;
+            $record = $this->dataObjectRecordProperty->getValue($object);
+            $id = !empty($record['ID']) ? $record['ID'] : 0;
 
             // check if batch contains object
-            if ($object->ID
-                && isset($this->batchLookup[$className][$object->ID])
-            ) {
+            if ($id && isset($this->batchLookup[$className][$id])) {
                 continue;
             } else if (isset($this->batchSearch[$className])
                 && in_array($object, $this->batchSearch[$className])
@@ -46,60 +51,70 @@ class BatchedWriter
             $this->batches[$className][] = $object;
 
             // add to lookup
-            if ($object->ID) {
-                $this->batchLookup[$className][$object->ID] = $object;
+            if ($id) {
+                $this->batchLookup[$className][$id] = $object;
             } else {
                 $this->batchSearch[$className][] = $object;
             }
 
             if (count($this->batches[$className]) >= $this->batchSize) {
-                $this->batch->write($this->batches[$className]);
+                $batch = $this->batches[$className];
                 unset($this->batches[$className]);
                 unset($this->batchLookup[$className]);
                 unset($this->batchSearch[$className]);
+
+                $this->batch->write($batch);
             }
         }
     }
 
-    public function writeToStage($dataObjects, $stage)
+    public function writeToStage($dataObjects, $key)
     {
         $stages = array_slice(func_get_args(), 1);
+        $key = serialize($stages);
 
-        foreach ($stages as $stage) {
-            if ($dataObjects instanceof DataObject) {
-                $dataObjects = array($dataObjects);
+        if ($dataObjects instanceof DataObject) {
+            $dataObjects = array($dataObjects);
+        }
+
+        foreach ($dataObjects as $object) {
+            $className = $object->class;
+            $record = $this->dataObjectRecordProperty->getValue($object);
+            $id = !empty($record['ID']) ? $record['ID'] : 0;
+
+            // check if stagedBatch contains object
+            if ($id && isset($this->stagedBatchLookup[$key][$className][$id])) {
+                continue;
+            } else if (isset($this->stagedBatchSearch[$key][$className])
+                && in_array($object, $this->stagedBatchSearch[$key][$className])
+            ) {
+                continue;
             }
 
-            foreach ($dataObjects as $object) {
-                $className = $object->ClassName;
+            $this->stagedBatches[$key][$className][] = $object;
 
-                // check if stagedBatch contains object
-                if ($object->ID
-                    && isset($this->stagedBatchLookup[$stage][$className][$object->ID])
-                ) {
-                    continue;
-                } else if (isset($this->stagedBatchSearch[$stage][$className])
-                    && in_array($object, $this->stagedBatchSearch[$stage][$className])
-                ) {
-                    continue;
+            // add to lookup
+            if ($id) {
+                $this->stagedBatchLookup[$key][$className][$id] = $object;
+            } else {
+                $this->stagedBatchSearch[$key][$className][] = $object;
+            }
+
+            if (count($this->stagedBatches[$key][$className]) >= $this->batchSize) {
+                $batch = $this->stagedBatches[$key][$className];
+                unset($this->stagedBatches[$key][$className]);
+                unset($this->stagedBatchLookup[$key][$className]);
+                unset($this->stagedBatchSearch[$key][$className]);
+                if (empty($this->stagedBatches[$key])) {
+                    unset($this->stagedBatches[$key]);
                 }
 
-                $this->stagedBatches[$stage][$className][] = $object;
-
-                // add to lookup
-                if ($object->ID) {
-                    $this->stagedBatchLookup[$stage][$className][$object->ID] = $object;
+                // hard code 2 stages at once
+                if (count($stages) === 2) {
+                    $this->batch->writeToStage($batch, $stages[0], $stages[1]);
                 } else {
-                    $this->stagedBatchSearch[$stage][$className][] = $object;
-                }
-
-                if (count($this->stagedBatches[$stage][$className]) >= $this->batchSize) {
-                    $this->batch->writeToStage($this->stagedBatches[$stage][$className], $stage);
-                    unset($this->stagedBatches[$stage][$className]);
-                    unset($this->stagedBatchLookup[$stage][$className]);
-                    unset($this->stagedBatchSearch[$stage][$className]);
-                    if (empty($this->stagedBatches[$stage])) {
-                        unset($this->stagedBatches[$stage]);
+                    foreach ($stages as $stage) {
+                        $this->batch->writeToStage($batch, $stage);
                     }
                 }
             }
@@ -108,16 +123,18 @@ class BatchedWriter
 
     public function writeManyMany($object, $relation, $belongs)
     {
+        $className = $object->class;
+
         foreach ($belongs as $belong) {
-            $this->manyManyBatches[$object->ClassName][$relation][] = array($object, $relation, $belong);
+            $this->manyManyBatches[$className][$relation][] = array($object, $relation, $belong);
         }
 
-        if (count($this->manyManyBatches[$object->ClassName][$relation]) >= $this->batchSize) {
-            $this->batch->writeManyMany($this->manyManyBatches[$object->ClassName][$relation]);
+        if (count($this->manyManyBatches[$className][$relation]) >= $this->batchSize) {
+            $this->batch->writeManyMany($this->manyManyBatches[$className][$relation]);
 
-            unset($this->manyManyBatches[$object->ClassName][$relation]);
-            if (empty($this->manyManyBatches[$object->ClassName])) {
-                unset($this->manyManyBatches[$object->ClassName]);
+            unset($this->manyManyBatches[$className][$relation]);
+            if (empty($this->manyManyBatches[$className])) {
+                unset($this->manyManyBatches[$className]);
             }
         }
     }
@@ -125,8 +142,11 @@ class BatchedWriter
     public function delete($objects)
     {
         foreach ($objects as $object) {
-            $className = $object->ClassName;
-            $this->deleteBatches[$className][] = $object->ID;
+            $className = $object->class;
+            $record = $this->dataObjectRecordProperty->getValue($object);
+            $id = !empty($record['ID']) ? $record['ID'] : 0;
+            $this->deleteBatches[$className][] = $id;
+
             if (count($this->deleteBatches[$className]) >= $this->batchSize) {
                 $this->batch->deleteIDs($className, $this->deleteBatches[$className]);
                 unset($this->deleteBatches[$className]);
@@ -141,6 +161,7 @@ class BatchedWriter
         } else {
             $this->deleteBatches[$className] = array_merge($this->deleteBatches[$className], $ids);
         }
+
         if (count($this->deleteBatches[$className]) >= $this->batchSize) {
             $this->batch->deleteIDs($className, $this->deleteBatches[$className]);
             unset($this->deleteBatches[$className]);
@@ -153,8 +174,12 @@ class BatchedWriter
 
         foreach ($stages as $stage) {
             foreach ($objects as $object) {
-                $className = $object->ClassName;
-                $this->stagedDeleteBatches[$stage][$className][] = $object->ID;
+                $className = $object->class;
+                $record = $this->dataObjectRecordProperty->getValue($object);
+                $id = !empty($record['ID']) ? $record['ID'] : 0;
+
+                $this->stagedDeleteBatches[$stage][$className][] = $id;
+
                 if (count($this->stagedDeleteBatches[$stage][$className]) >= $this->batchSize) {
                     $this->batch->deleteIDsFromStage($className, $this->stagedDeleteBatches[$stage][$className], $stage);
 
@@ -196,30 +221,43 @@ class BatchedWriter
             || !empty($this->deleteBatches)
             || !empty($this->stagedDeleteBatches)
         ) {
-            foreach ($this->batches as $className => $objects) {
-                $this->batch->write($objects);
-                unset($this->batches[$className]);
-                unset($this->batchLookup[$className]);
-                unset($this->batchSearch[$className]);
+            while (!empty($this->batches)) {
+                // assign to variable and clear so any new batches will be written next loop
+                $batches = $this->batches;
+                $this->batches = array();
+                $this->batchLookup = array();
+                $this->batchSearch = array();
+
+                foreach ($batches as $className => $objects) {
+                    $this->batch->write($objects);
+                }
             }
 
-            foreach ($this->stagedBatches as $stage => $classNames) {
-                foreach ($classNames as $className => $objects) {
-                    $this->batch->writeToStage($objects, $stage);
-                    unset($this->stagedBatches[$stage][$className]);
-                    unset($this->stagedBatchLookup[$stage][$className]);
-                    unset($this->stagedBatchSearch[$stage][$className]);
-                    if (empty($this->stagedBatches[$stage])) {
-                        unset($this->stagedBatches[$stage]);
+            foreach ($this->stagedBatches as $key => $classNames) {
+                $stages = unserialize($key);
+                $batches = $this->stagedBatches[$key];
+                unset($this->stagedBatches[$key]);
+                $this->stagedBatchSearch[$key] = array();
+                $this->stagedBatchLookup[$key] = array();
+
+                foreach ($batches as $className => $objects) {
+                    if (count($stages) === 2) {
+                        $this->batch->writeToStage($objects, $stages[0], $stages[1]);
+                    } else {
+                        foreach ($stages as $stage) {
+                            $this->batch->writeToStage($objects, $stage);
+                        }
                     }
                 }
             }
 
             foreach ($this->manyManyBatches as $className => $relations) {
-                foreach ($relations as $relation => $sets) {
+                $batches = $this->manyManyBatches[$className];
+                unset($this->manyManyBatches[$className]);
+
+                foreach ($batches as $relation => $sets) {
                     $this->batch->writeManyMany($sets);
                 }
-                unset($this->manyManyBatches[$className]);
             }
 
             foreach ($this->deleteBatches as $className => $ids) {

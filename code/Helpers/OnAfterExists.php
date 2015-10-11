@@ -6,10 +6,15 @@ class OnAfterExists
 
     private $callback;
 
+    private $dataObjectRecordProperty;
+
     public function __construct(callable $callback)
     {
-        $this->objects = new ArrayList();
+        $this->objects = new ArrayObject();
         $this->callback = $callback;
+
+        $this->dataObjectRecordProperty = new ReflectionProperty('DataObject', 'record');
+        $this->dataObjectRecordProperty->setAccessible(true);
     }
 
     public function addCondition($objects, callable $callback = null)
@@ -19,7 +24,7 @@ class OnAfterExists
         }
 
         foreach ($objects as $object) {
-            $this->objects->add($object);
+            $this->objects[] = $object;
 
             $everyObject = $this->objects;
             $existsCallback = $this->callback;
@@ -30,7 +35,8 @@ class OnAfterExists
 
                 $exists = true;
                 foreach ($everyObject as $object) {
-                    if (!$object->exists()) {
+                    $record = $this->dataObjectRecordProperty->getValue($object);
+                    if (empty($record['ID'])) {
                         $exists = false;
                         break;
                     }
