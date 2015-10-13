@@ -6,16 +6,16 @@ class BatchDeleteTest extends \SapphireTest
 {
     protected $usesDatabase = true;
 
-    protected $extraDataObjects = array(
-        'BatchWrite\Tests\Animal',
-        'BatchWrite\Tests\Batman',
-        'BatchWrite\Tests\Cat',
-        'BatchWrite\Tests\Child',
-        'BatchWrite\Tests\Child',
-        'BatchWrite\Tests\Dog',
-        'BatchWrite\Tests\DogPage',
-        'BatchWrite\Tests\Human',
-    );
+//    protected $extraDataObjects = array(
+//        'BatchWrite\Tests\Animal',
+//        'BatchWrite\Tests\Batman',
+//        'BatchWrite\Tests\Cat',
+//        'BatchWrite\Tests\Child',
+//        'BatchWrite\Tests\Child',
+//        'BatchWrite\Tests\Dog',
+//        'BatchWrite\Tests\DogPage',
+//        'BatchWrite\Tests\Human',
+//    );
 
 //    public function __construct()
 //    {
