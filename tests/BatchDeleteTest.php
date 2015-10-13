@@ -17,11 +17,11 @@ class BatchDeleteTest extends \SapphireTest
         'BatchWrite\Tests\Human',
     );
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->setUpOnce();
-    }
+//    public function __construct()
+//    {
+//        parent::__construct();
+//        $this->setUpOnce();
+//    }
 
     public function testBranchDelete_DeleteManyObjects_ObjectsDeleted()
     {
@@ -100,10 +100,9 @@ class BatchDeleteTest extends \SapphireTest
         \Versioned::reading_stage($currentStage);
     }
 
-
-    public static function tearDownAfterClass()
-    {
-        parent::tearDownAfterClass();
-        \SapphireTest::delete_all_temp_dbs();
-    }
+//    public static function tearDownAfterClass()
+//    {
+//        parent::tearDownAfterClass();
+//        \SapphireTest::delete_all_temp_dbs();
+//    }
 }

@@ -17,11 +17,11 @@ class OnAfterExistsTest extends \SapphireTest
         'BatchWrite\Tests\Human',
     );
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->setUpOnce();
-    }
+//    public function __construct()
+//    {
+//        parent::__construct();
+//        $this->setUpOnce();
+//    }
 
     public function testCallback_OneCondition_CalledBack()
     {
@@ -124,9 +124,9 @@ class OnAfterExistsTest extends \SapphireTest
         $this->assertEquals(5, $parent->Children()->Count());
     }
 
-    public static function tearDownAfterClass()
-    {
-        parent::tearDownAfterClass();
-        \SapphireTest::delete_all_temp_dbs();
-    }
+//    public static function tearDownAfterClass()
+//    {
+//        parent::tearDownAfterClass();
+//        \SapphireTest::delete_all_temp_dbs();
+//    }
 }
