@@ -2,7 +2,7 @@
 
 namespace BatchWrite\Tests;
 
-class Dog extends Animal
+class Dog extends Animal implements \TestOnly
 {
     public static $db = array(
         'Type' => 'Varchar',

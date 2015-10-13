@@ -17,11 +17,11 @@ class BatchWriteTest extends \SapphireTest
         'BatchWrite\Tests\Human',
     );
 
-//    public function __construct()
-//    {
-//        parent::__construct();
-//        $this->setUpOnce();
-//    }
+    public function __construct()
+    {
+        parent::__construct();
+        $this->setUpOnce();
+    }
 
     public function testBatchWrite_WriteObject_ObjectExists()
     {
@@ -228,9 +228,9 @@ class BatchWriteTest extends \SapphireTest
         $this->assertEquals(1, $cat->HasClaws);
     }
 
-//    public static function tearDownAfterClass()
-//    {
-//        parent::tearDownAfterClass();
-//        \SapphireTest::delete_all_temp_dbs();
-//    }
+    public static function tearDownAfterClass()
+    {
+        parent::tearDownAfterClass();
+        \SapphireTest::delete_all_temp_dbs();
+    }
 }

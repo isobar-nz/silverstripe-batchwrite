@@ -16,6 +16,5 @@ before_script:
  - cd ~/builds/ss
 
 script:
- - php framework/cli-script.php dev/build flush=1
  - vendor/bin/phpunit batchwrite/tests/
 

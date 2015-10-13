@@ -2,7 +2,7 @@
 
 namespace BatchWrite\Tests;
 
-class Cat extends Animal
+class Cat extends Animal implements \TestOnly
 {
     private $onBeforeWriteCalled = false;
 

@@ -2,7 +2,7 @@
 
 namespace BatchWrite\Tests;
 
-class DogPage extends \SiteTree
+class DogPage extends \SiteTree implements \TestOnly
 {
     public static $db = array(
         'Author' => 'Varchar',

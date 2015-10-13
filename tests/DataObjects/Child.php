@@ -2,7 +2,7 @@
 
 namespace BatchWrite\Tests;
 
-class Child extends \DataObject
+class Child extends \DataObject implements \TestOnly
 {
     public static $db = array(
         'Name' => 'Varchar',
