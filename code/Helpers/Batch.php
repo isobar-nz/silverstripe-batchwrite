@@ -275,6 +275,10 @@ class Batch
         $conn = $this->connProperty->getValue(DB::getConn());
         $stmt = $conn->prepare($sql);
 
+        if (!$stmt) {
+            throw new Exception('Invalid query: '. $sql);
+        }
+
         $refs = array();
         foreach ($params as $key => $value) {
             $refs[$key] = &$params[$key];
