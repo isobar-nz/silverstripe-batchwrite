@@ -8,7 +8,7 @@ class Child extends \DataObject
         'Name' => 'Varchar',
     );
 
-    private static $belongs_many_many = array(
+    public static $belongs_many_many = array(
         'BelongsParent' => 'BatchWrite\Tests\Human',
     );
 }

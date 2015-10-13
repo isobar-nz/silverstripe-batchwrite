@@ -8,7 +8,7 @@ class Human extends \DataObject
         'Name' => 'Varchar',
     );
 
-    private static $many_many = array(
+    public static $many_many = array(
         'Children' => 'BatchWrite\Tests\Child',
     );
 }

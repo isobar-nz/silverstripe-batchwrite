@@ -13,7 +13,7 @@ class Cat extends Animal
         'HasClaws' => 'Boolean',
     );
 
-    private static $has_one = array(
+    public static $has_one = array(
         'Enemy' => 'BatchWrite\Tests\Dog',
     );
 
