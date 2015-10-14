@@ -1,24 +1,63 @@
 <?php
 
+/**
+ * Class BatchedWriter
+ */
 class BatchedWriter
 {
+    /**
+     * @var int
+     */
     private $batchSize;
 
+    /**
+     * @var array
+     */
     private $batches = array();
+    /**
+     * @var array
+     */
     private $batchLookup = array();
+    /**
+     * @var array
+     */
     private $batchSearch = array();
 
+    /**
+     * @var array
+     */
     private $stagedBatches = array();
+    /**
+     * @var array
+     */
     private $stagedBatchLookup = array();
+    /**
+     * @var array
+     */
     private $stagedBatchSearch = array();
 
+    /**
+     * @var array
+     */
     private $deleteBatches = array();
+    /**
+     * @var array
+     */
     private $stagedDeleteBatches = array();
 
+    /**
+     * @var array
+     */
     private $manyManyBatches = array();
 
+    /**
+     * @var ReflectionProperty
+     */
     private $dataObjectRecordProperty;
 
+    /**
+     * @param int $batchSize
+     */
     public function __construct($batchSize = 100)
     {
         $this->batch = new Batch();
@@ -28,6 +67,9 @@ class BatchedWriter
         $this->dataObjectRecordProperty->setAccessible(true);
     }
 
+    /**
+     * @param $dataObjects
+     */
     public function write($dataObjects)
     {
         if ($dataObjects instanceof DataObject) {
@@ -68,6 +110,10 @@ class BatchedWriter
         }
     }
 
+    /**
+     * @param $dataObjects
+     * @param $key
+     */
     public function writeToStage($dataObjects, $key)
     {
         $stages = array_slice(func_get_args(), 1);
@@ -121,6 +167,11 @@ class BatchedWriter
         }
     }
 
+    /**
+     * @param $object
+     * @param $relation
+     * @param $belongs
+     */
     public function writeManyMany($object, $relation, $belongs)
     {
         $className = $object->class;
@@ -139,6 +190,9 @@ class BatchedWriter
         }
     }
 
+    /**
+     * @param $objects
+     */
     public function delete($objects)
     {
         foreach ($objects as $object) {
@@ -154,6 +208,10 @@ class BatchedWriter
         }
     }
 
+    /**
+     * @param $className
+     * @param $ids
+     */
     public function deleteIDs($className, $ids)
     {
         if (!is_array($ids)) {
@@ -172,6 +230,10 @@ class BatchedWriter
         }
     }
 
+    /**
+     * @param $objects
+     * @param $stage
+     */
     public function deleteFromStage($objects, $stage)
     {
         $stages = array_slice(func_get_args(), 1);
@@ -196,6 +258,11 @@ class BatchedWriter
         }
     }
 
+    /**
+     * @param $className
+     * @param $ids
+     * @param $stage
+     */
     public function deleteIDsFromStage($className, $ids, $stage)
     {
         $stages = array_slice(func_get_args(), 2);
@@ -221,6 +288,9 @@ class BatchedWriter
         }
     }
 
+    /**
+     *
+     */
     public function finish()
     {
         while (!empty($this->batches)

@@ -1,9 +1,19 @@
 <?php
 
+/**
+ * Class QuickDataObject
+ */
 class QuickDataObject
 {
+    /**
+     * @var array
+     */
     private static $instances = array();
 
+    /**
+     * @param $className
+     * @return mixed
+     */
     public static function create($className)
     {
         static $extensionInstanceProperty = null;

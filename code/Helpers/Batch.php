@@ -1,13 +1,28 @@
 <?php
 
+/**
+ * Class Batch
+ */
 class Batch
 {
+    /**
+     * @var ReflectionProperty
+     */
     private $connProperty;
 
+    /**
+     * @var ReflectionProperty
+     */
     private $dataObjectRecordProperty;
 
+    /**
+     * @var array
+     */
     private $relations = array();
 
+    /**
+     *
+     */
     public function __construct()
     {
         $this->connProperty = new ReflectionProperty('MySQLDatabase', 'dbConn');
@@ -17,6 +32,9 @@ class Batch
         $this->dataObjectRecordProperty->setAccessible(true);
     }
 
+    /**
+     * @param $dataObjects
+     */
     public function write($dataObjects)
     {
         if (empty($dataObjects)) {
@@ -34,6 +52,9 @@ class Batch
         }
     }
 
+    /**
+     * @param $dataObjects
+     */
     public function writeToStage($dataObjects)
     {
         if (empty($dataObjects)) {
@@ -56,6 +77,11 @@ class Batch
         }
     }
 
+    /**
+     * @param $dataObjects
+     * @param string $postfix
+     * @return mixed
+     */
     private function writeTablePostfix($dataObjects, $postfix = '')
     {
         if ($postfix === 'Stage') {
@@ -120,6 +146,14 @@ class Batch
         return $dataObjects;
     }
 
+    /**
+     * @param $objects
+     * @param $class
+     * @param $table
+     * @param bool $setID
+     * @param bool $update
+     * @throws Exception
+     */
     private function writeClassTable($objects, $class, $table, $setID = false, $update = false)
     {
         $fields = DataObject::database_fields($class);
@@ -193,6 +227,10 @@ class Batch
         $this->executeQuery($sql, $params);
     }
 
+    /**
+     * @param $sets
+     * @throws Exception
+     */
     public function writeManyMany($sets)
     {
         if (empty($sets)) {
@@ -244,6 +282,11 @@ class Batch
         }
     }
 
+    /**
+     * @param $parent
+     * @param $relation
+     * @return array
+     */
     private function getRelationFields($parent, $relation)
     {
         if (isset($this->relations[$parent->class][$relation])) {
@@ -270,6 +313,11 @@ class Batch
         return array($parent->class . 'ID', $relation, $parent->class . 'ID');
     }
 
+    /**
+     * @param $sql
+     * @param $params
+     * @throws Exception
+     */
     private function executeQuery($sql, $params)
     {
         $conn = $this->connProperty->getValue(DB::getConn());
@@ -288,6 +336,9 @@ class Batch
         $stmt->execute();
     }
 
+    /**
+     * @param $dataObjects
+     */
     public function delete($dataObjects)
     {
         $types = array();
@@ -302,11 +353,18 @@ class Batch
         }
     }
 
+    /**
+     * @param $className
+     * @param $ids
+     */
     public function deleteIDs($className, $ids)
     {
         $this->deleteTablePostfix($className, $ids);
     }
 
+    /**
+     * @param $dataObjects
+     */
     public function deleteFromStage($dataObjects)
     {
         $stages = array_slice(func_get_args(), 1);
@@ -325,6 +383,10 @@ class Batch
         }
     }
 
+    /**
+     * @param $className
+     * @param $ids
+     */
     public function deleteIDsFromStage($className, $ids)
     {
         $stages = array_slice(func_get_args(), 2);
@@ -334,6 +396,11 @@ class Batch
         }
     }
 
+    /**
+     * @param $className
+     * @param $ids
+     * @param string $postfix
+     */
     private function deleteTablePostfix($className, $ids, $postfix = '')
     {
         if (empty($ids)) {

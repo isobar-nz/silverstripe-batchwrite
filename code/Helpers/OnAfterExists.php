@@ -1,13 +1,28 @@
 <?php
 
+/**
+ * Class OnAfterExists
+ */
 class OnAfterExists
 {
+    /**
+     * @var ArrayObject
+     */
     private $objects;
 
+    /**
+     * @var callable
+     */
     private $callback;
 
+    /**
+     * @var ReflectionProperty
+     */
     private $dataObjectRecordProperty;
 
+    /**
+     * @param callable $callback
+     */
     public function __construct(callable $callback)
     {
         $this->objects = new ArrayObject();
@@ -17,11 +32,18 @@ class OnAfterExists
         $this->dataObjectRecordProperty->setAccessible(true);
     }
 
+    /**
+     * @return int
+     */
     public function count()
     {
         return count($this->objects);
     }
 
+    /**
+     * @param $objects
+     * @param callable $callback
+     */
     public function addCondition($objects, callable $callback = null)
     {
         if ($objects instanceof DataObject) {
@@ -33,14 +55,16 @@ class OnAfterExists
 
             $everyObject = $this->objects;
             $existsCallback = $this->callback;
-            $object->onAfterExistsCallback(function ($object) use ($callback, $everyObject, $existsCallback) {
+            $dataObjectProperty = $this->dataObjectRecordProperty;
+
+            $object->onAfterExistsCallback(function ($object) use ($callback, $everyObject, $existsCallback, $dataObjectProperty) {
                 if ($callback) {
                     $callback($object);
                 }
 
                 $exists = true;
                 foreach ($everyObject as $object) {
-                    $record = $this->dataObjectRecordProperty->getValue($object);
+                    $record = $dataObjectProperty->getValue($object);
                     if (empty($record['ID'])) {
                         $exists = false;
                         break;
