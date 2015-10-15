@@ -11,10 +11,6 @@
   "support": {
     "issues": "http://github.com/Little-Giant/silverstripe-seeder/issues"
   },
-  "require": {
-    "silverstripe/cms": ">=3.0",
-    "silverstripe/framework": ">=3.0"
-  },
   "extra": {
     "installer-name": "silverstripe-batchwrite"
   }
