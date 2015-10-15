@@ -1,5 +1,5 @@
 {
-  "name": "Little-Giant/silverstripe-batchwrite",
+  "name": "littlegiant/silverstripe-batchwrite",
   "description": "Batch write for silverstripe data objects",
   "type": "silverstripe-module",
   "homepage": "http://github.com/Little-Giant/silverstripe-batchwrite",
