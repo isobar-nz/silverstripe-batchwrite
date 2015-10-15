@@ -1,21 +1,21 @@
 {
-  "name": "chrisahhh/batchwrite",
+  "name": "Little-Giant/silverstripe-batchwrite",
   "description": "Batch write for silverstripe data objects",
   "type": "silverstripe-module",
-  "homepage": "http://github.com/chrisahhh/silverstripe-batchwrite",
+  "homepage": "http://github.com/Little-Giant/silverstripe-batchwrite",
   "keywords": ["silverstripe", "batch", "performance"],
   "license": "BSD-2-Clause",
   "authors": [
-    {"name": "Christopher Barrett","email": "christopherwalkerbarrett@gmail.com"}
+    {"name": "Little Giant","email": "webmaster@littlegiant.co.nz"}
   ],
   "support": {
-    "issues": "http://github.com/chrisahhh/silverstripe-batchwrite/issues"
+    "issues": "http://github.com/Little-Giant/silverstripe-seeder/issues"
   },
   "require": {
     "silverstripe/cms": ">=3.0",
     "silverstripe/framework": ">=3.0"
   },
   "extra": {
-    "installer-name": "batchwrite"
+    "installer-name": "silverstripe-batchwrite"
   }
 }
