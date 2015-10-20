@@ -3,7 +3,7 @@ silverstripe-batchwrite
 
 Batchwrite data objects to improve bulk insert/update/delete performance. **Currently supports MySQL and only when the `mysqli` adapater is used.**
 
-- [Basic usage](#user-bacontent-basic-usage)
+- [Basic usage](#user-content-basic-usage)
 - [Abstracting batch by using BatchedWriter](#user-content-abstracting-batch-by-using-batchedwriter)
 - [Dealing with has_one, has_many and many_many](#user-content-dealing-with-has_one-has_many-and-many_many)
 - [Squeezing out more performance](#user-content-squeezing-out-more-performance)
