@@ -229,7 +229,7 @@ In a similar fashion use `onAfterExistsCallback` to write has_many objects
 
     for ($i = 0; $i < 10; $i++) {
         $member = new TeamMember(); # has_one = array('Team' => 'Team');
-        $team->onAfterExists(function ($team) use ($member, $writer) {
+        $team->onAfterExistsCallback(function ($team) use ($member, $writer) {
             $member->TeamID = $team->ID;
             $writer->write($team);
         });
