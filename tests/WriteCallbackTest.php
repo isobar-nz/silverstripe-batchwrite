@@ -6,6 +6,10 @@ namespace BatchWrite\Tests;
  * Class WriteCallbackTest
  * @package BatchWrite\Tests
  */
+/**
+ * Class WriteCallbackTest
+ * @package BatchWrite\Tests
+ */
 class WriteCallbackTest extends \SapphireTest
 {
     /**
@@ -26,12 +30,14 @@ class WriteCallbackTest extends \SapphireTest
         'BatchWrite\Tests\DogPage',
         'BatchWrite\Tests\Human',
     );
-//
-//    public function __construct()
-//    {
-//        parent::__construct();
-//        $this->setUpOnce();
-//    }
+
+    /**
+     * WriteCallbackTest constructor.
+     */
+    public function __construct()
+    {
+        $this->setUpOnce();
+    }
 
     /**
      * @throws \ValidationException

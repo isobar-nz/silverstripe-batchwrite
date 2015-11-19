@@ -6,6 +6,10 @@ namespace BatchWrite\Tests;
  * Class BatchedWriterTest
  * @package BatchWrite\Tests
  */
+/**
+ * Class BatchedWriterTest
+ * @package BatchWrite\Tests
+ */
 class BatchedWriterTest extends \SapphireTest
 {
     /**
@@ -27,11 +31,13 @@ class BatchedWriterTest extends \SapphireTest
         'BatchWrite\Tests\Human',
     );
 
-//    public function __construct()
-//    {
-//        parent::__construct();
-//        $this->setUpOnce();
-//    }
+    /**
+     * BatchedWriterTest constructor.
+     */
+    public function __construct()
+    {
+        $this->setUpOnce();
+    }
 
     /**
      *

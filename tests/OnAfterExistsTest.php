@@ -6,6 +6,10 @@ namespace BatchWrite\Tests;
  * Class OnAfterExistsTest
  * @package BatchWrite\Tests
  */
+/**
+ * Class OnAfterExistsTest
+ * @package BatchWrite\Tests
+ */
 class OnAfterExistsTest extends \SapphireTest
 {
     /**
@@ -27,11 +31,13 @@ class OnAfterExistsTest extends \SapphireTest
         'BatchWrite\Tests\Human',
     );
 
-//    public function __construct()
-//    {
-//        parent::__construct();
-//        $this->setUpOnce();
-//    }
+    /**
+     * OnAfterExistsTest constructor.
+     */
+    public function __construct()
+    {
+        $this->setUpOnce();
+    }
 
     /**
      * @throws \ValidationException

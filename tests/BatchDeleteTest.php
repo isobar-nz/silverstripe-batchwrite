@@ -6,6 +6,10 @@ namespace BatchWrite\Tests;
  * Class BatchDeleteTest
  * @package BatchWrite\Tests
  */
+/**
+ * Class BatchDeleteTest
+ * @package BatchWrite\Tests
+ */
 class BatchDeleteTest extends \SapphireTest
 {
     /**
@@ -27,11 +31,13 @@ class BatchDeleteTest extends \SapphireTest
         'BatchWrite\Tests\Human',
     );
 
-//    public function __construct()
-//    {
-//        parent::__construct();
-//        $this->setUpOnce();
-//    }
+    /**
+     * BatchDeleteTest constructor.
+     */
+    public function __construct()
+    {
+        $this->setUpOnce();
+    }
 
     /**
      * @throws \ValidationException
