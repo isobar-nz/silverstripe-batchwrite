@@ -2,10 +2,20 @@
 
 namespace BatchWrite\Tests;
 
+/**
+ * Class BatchDeleteTest
+ * @package BatchWrite\Tests
+ */
 class BatchDeleteTest extends \SapphireTest
 {
+    /**
+     * @var bool
+     */
     protected $usesDatabase = true;
 
+    /**
+     * @var array
+     */
     protected $extraDataObjects = array(
         'BatchWrite\Tests\Animal',
         'BatchWrite\Tests\Batman',
@@ -17,12 +27,16 @@ class BatchDeleteTest extends \SapphireTest
         'BatchWrite\Tests\Human',
     );
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->setUpOnce();
-    }
+//    public function __construct()
+//    {
+//        parent::__construct();
+//        $this->setUpOnce();
+//    }
 
+    /**
+     * @throws \ValidationException
+     * @throws null
+     */
     public function testBranchDelete_DeleteManyObjects_ObjectsDeleted()
     {
         $objects = array();
@@ -48,6 +62,10 @@ class BatchDeleteTest extends \SapphireTest
         $this->assertEquals(0, Human::get()->Count());
     }
 
+    /**
+     * @throws \ValidationException
+     * @throws null
+     */
     public function testBranchDeleteIDs_DeleteManyIDs_ObjectsDeleted()
     {
         $className = '';
@@ -67,6 +85,9 @@ class BatchDeleteTest extends \SapphireTest
         $this->assertEquals(0, Dog::get()->Count());
     }
 
+    /**
+     *
+     */
     public function testBatchDelete_VersionedObject_ObjectsDeleted()
     {
         $pages = array();
@@ -99,10 +120,10 @@ class BatchDeleteTest extends \SapphireTest
 
         \Versioned::reading_stage($currentStage);
     }
-
-    public static function tearDownAfterClass()
-    {
-        parent::tearDownAfterClass();
-        \SapphireTest::delete_all_temp_dbs();
-    }
+//
+//    public static function tearDownAfterClass()
+//    {
+//        parent::tearDownAfterClass();
+//        \SapphireTest::delete_all_temp_dbs();
+//    }
 }

@@ -16,5 +16,5 @@ before_script:
  - cd ~/builds/ss
 
 script:
- - vendor/bin/phpunit batchwrite/tests/
+ - vendor/bin/phpunit silverstripe-batchwrite/tests/
 

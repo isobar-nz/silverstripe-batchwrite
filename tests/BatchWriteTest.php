@@ -2,10 +2,20 @@
 
 namespace BatchWrite\Tests;
 
+/**
+ * Class BatchWriteTest
+ * @package BatchWrite\Tests
+ */
 class BatchWriteTest extends \SapphireTest
 {
+    /**
+     * @var bool
+     */
     protected $usesDatabase = true;
 
+    /**
+     * @var array
+     */
     protected $extraDataObjects = array(
         'BatchWrite\Tests\Animal',
         'BatchWrite\Tests\Batman',
@@ -17,12 +27,15 @@ class BatchWriteTest extends \SapphireTest
         'BatchWrite\Tests\Human',
     );
 
-    public function __construct()
-    {
-        parent::__construct();
-        $this->setUpOnce();
-    }
+//    public function __construct()
+//    {
+//        parent::__construct();
+//        $this->setUpOnce();
+//    }
 
+    /**
+     *
+     */
     public function testBatchWrite_WriteObject_ObjectExists()
     {
         $animal = new Animal();
@@ -37,6 +50,9 @@ class BatchWriteTest extends \SapphireTest
         $this->assertEquals(1, Animal::get()->count());
     }
 
+    /**
+     *
+     */
     public function testBatchWrite_WriteLotsObjects_ObjectsExist()
     {
         $animals = array();
@@ -59,6 +75,9 @@ class BatchWriteTest extends \SapphireTest
         $this->assertEquals(100, Animal::get()->count());
     }
 
+    /**
+     *
+     */
     public function testBatchWrite_NestedObjects_ObjectsExist()
     {
         $dogs = array();
@@ -89,6 +108,9 @@ class BatchWriteTest extends \SapphireTest
         }
     }
 
+    /**
+     *
+     */
     public function testBatchWrite_OnBeforeOnAfterCalled_ReturnsTrue()
     {
         $cat = new Cat();
@@ -106,6 +128,10 @@ class BatchWriteTest extends \SapphireTest
         $this->assertEquals(1, Cat::get()->count());
     }
 
+    /**
+     * @throws \ValidationException
+     * @throws null
+     */
     public function testBatchWrite_ObjectExists_UpdatesObject()
     {
         $dog = new Dog();
@@ -126,6 +152,9 @@ class BatchWriteTest extends \SapphireTest
         $this->assertEquals('Brown', $dog->Color);
     }
 
+    /**
+     *
+     */
     public function testBatchWrite_WriteObjectToStage_WritesStage()
     {
         $page = new DogPage();
@@ -151,6 +180,9 @@ class BatchWriteTest extends \SapphireTest
         \Versioned::reading_stage($currentStage);
     }
 
+    /**
+     *
+     */
     public function testBatchWrite_WriteObjectToLive_WritesLive()
     {
         $page = new DogPage();
@@ -176,6 +208,9 @@ class BatchWriteTest extends \SapphireTest
         \Versioned::reading_stage($currentStage);
     }
 
+    /**
+     *
+     */
     public function testBatchWrite_WriteObjectToStageAndLive_WritesStageAndLive()
     {
         $page = new DogPage();
@@ -203,6 +238,9 @@ class BatchWriteTest extends \SapphireTest
         \Versioned::reading_stage($currentStage);
     }
 
+    /**
+     *
+     */
     public function testBatchWrite_DifferentClasses_WritesObjects()
     {
         $dog = new Dog();
@@ -228,9 +266,9 @@ class BatchWriteTest extends \SapphireTest
         $this->assertEquals(1, $cat->HasClaws);
     }
 
-    public static function tearDownAfterClass()
-    {
-        parent::tearDownAfterClass();
-        \SapphireTest::delete_all_temp_dbs();
-    }
+//    public static function tearDownAfterClass()
+//    {
+//        parent::tearDownAfterClass();
+//        \SapphireTest::delete_all_temp_dbs();
+//    }
 }
