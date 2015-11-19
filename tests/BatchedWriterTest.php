@@ -2,10 +2,24 @@
 
 namespace BatchWrite\Tests;
 
+/**
+ * Class BatchedWriterTest
+ * @package BatchWrite\Tests
+ */
+/**
+ * Class BatchedWriterTest
+ * @package BatchWrite\Tests
+ */
 class BatchedWriterTest extends \SapphireTest
 {
+    /**
+     * @var bool
+     */
     protected $usesDatabase = true;
 
+    /**
+     * @var array
+     */
     protected $extraDataObjects = array(
         'BatchWrite\Tests\Animal',
         'BatchWrite\Tests\Batman',
@@ -17,12 +31,17 @@ class BatchedWriterTest extends \SapphireTest
         'BatchWrite\Tests\Human',
     );
 
+    /**
+     * BatchedWriterTest constructor.
+     */
     public function __construct()
     {
-        parent::__construct();
         $this->setUpOnce();
     }
 
+    /**
+     *
+     */
     public function testWrite_WriteObjects_ObjectsWritten()
     {
         $batchSizes = array(10, 30, 100, 300);
@@ -97,6 +116,9 @@ class BatchedWriterTest extends \SapphireTest
         }
     }
 
+    /**
+     *
+     */
     public function testWriteManyMany_SetChildrenForParent_RelationWritten()
     {
         $parent = new Human();
@@ -126,6 +148,9 @@ class BatchedWriterTest extends \SapphireTest
         $this->assertEquals(5, $parent->Children()->Count());
     }
 
+    /**
+     *
+     */
     public function testWriteToStages_ManyPages_WritesObjectsToStage()
     {
         $sizes = array(10, 30, 100, 300);
@@ -165,10 +190,10 @@ class BatchedWriterTest extends \SapphireTest
             $this->assertEquals(0, DogPage::get()->Count());
         }
     }
-
-    public static function tearDownAfterClass()
-    {
-        parent::tearDownAfterClass();
-        \SapphireTest::delete_all_temp_dbs();
-    }
+//
+//    public static function tearDownAfterClass()
+//    {
+//        parent::tearDownAfterClass();
+//        \SapphireTest::delete_all_temp_dbs();
+//    }
 }

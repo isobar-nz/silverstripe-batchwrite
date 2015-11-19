@@ -2,10 +2,24 @@
 
 namespace BatchWrite\Tests;
 
+/**
+ * Class OnAfterExistsTest
+ * @package BatchWrite\Tests
+ */
+/**
+ * Class OnAfterExistsTest
+ * @package BatchWrite\Tests
+ */
 class OnAfterExistsTest extends \SapphireTest
 {
+    /**
+     * @var bool
+     */
     protected $usesDatabase = true;
 
+    /**
+     * @var array
+     */
     protected $extraDataObjects = array(
         'BatchWrite\Tests\Animal',
         'BatchWrite\Tests\Batman',
@@ -17,12 +31,18 @@ class OnAfterExistsTest extends \SapphireTest
         'BatchWrite\Tests\Human',
     );
 
+    /**
+     * OnAfterExistsTest constructor.
+     */
     public function __construct()
     {
-        parent::__construct();
         $this->setUpOnce();
     }
 
+    /**
+     * @throws \ValidationException
+     * @throws null
+     */
     public function testCallback_OneCondition_CalledBack()
     {
         $dog = new Dog();
@@ -45,6 +65,10 @@ class OnAfterExistsTest extends \SapphireTest
         $this->assertEquals($owner->ID, $dog->OwnerID);
     }
 
+    /**
+     * @throws \ValidationException
+     * @throws null
+     */
     public function testCallback_ManyConditions_CalledBack()
     {
         $dog = new Dog();
@@ -92,6 +116,9 @@ class OnAfterExistsTest extends \SapphireTest
         $this->assertEquals('Johnny Bob Wot Agnis', $dog->Name);
     }
 
+    /**
+     *
+     */
     public function testOnAfterExists_ArrayCondition_CalledBack()
     {
         $parent = new Human();
@@ -123,10 +150,10 @@ class OnAfterExistsTest extends \SapphireTest
         $parent = Human::get()->first();
         $this->assertEquals(5, $parent->Children()->Count());
     }
-
-    public static function tearDownAfterClass()
-    {
-        parent::tearDownAfterClass();
-        \SapphireTest::delete_all_temp_dbs();
-    }
+//
+//    public static function tearDownAfterClass()
+//    {
+//        parent::tearDownAfterClass();
+//        \SapphireTest::delete_all_temp_dbs();
+//    }
 }

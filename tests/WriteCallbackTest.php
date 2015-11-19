@@ -2,10 +2,24 @@
 
 namespace BatchWrite\Tests;
 
+/**
+ * Class WriteCallbackTest
+ * @package BatchWrite\Tests
+ */
+/**
+ * Class WriteCallbackTest
+ * @package BatchWrite\Tests
+ */
 class WriteCallbackTest extends \SapphireTest
 {
+    /**
+     * @var bool
+     */
     protected $usesDatabase = true;
 
+    /**
+     * @var array
+     */
     protected $extraDataObjects = array(
         'BatchWrite\Tests\Animal',
         'BatchWrite\Tests\Batman',
@@ -17,12 +31,18 @@ class WriteCallbackTest extends \SapphireTest
         'BatchWrite\Tests\Human',
     );
 
+    /**
+     * WriteCallbackTest constructor.
+     */
     public function __construct()
     {
-        parent::__construct();
         $this->setUpOnce();
     }
 
+    /**
+     * @throws \ValidationException
+     * @throws null
+     */
     public function testCallback_SetOnAfterWriteCallback_CallbackCalled()
     {
         $dog = new Dog();
@@ -45,6 +65,10 @@ class WriteCallbackTest extends \SapphireTest
         $this->assertEquals($owner->ID, $dog->OwnerID);
     }
 
+    /**
+     * @throws \ValidationException
+     * @throws null
+     */
     public function testCallback_SetOnBeforeWriteCallback_CallbackCalled()
     {
         $dog = new Dog();
@@ -67,6 +91,10 @@ class WriteCallbackTest extends \SapphireTest
         $this->assertEquals($owner->ID, $dog->OwnerID);
     }
 
+    /**
+     * @throws \ValidationException
+     * @throws null
+     */
     public function testCallback_SetOnAfterExistsCallback_CallbackCalled()
     {
         $dog1 = new Dog();
@@ -100,9 +128,9 @@ class WriteCallbackTest extends \SapphireTest
         $this->assertEquals($owner->ID, $dog2->OwnerID);
     }
 
-    public static function tearDownAfterClass()
-    {
-        parent::tearDownAfterClass();
-        \SapphireTest::delete_all_temp_dbs();
-    }
+//    public static function tearDownAfterClass()
+//    {
+//        parent::tearDownAfterClass();
+//        \SapphireTest::delete_all_temp_dbs();
+//    }
 }
