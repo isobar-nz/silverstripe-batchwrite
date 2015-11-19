@@ -40,7 +40,7 @@ class WriteCallbackExtension extends DataExtension
     /**
      * @param callable $callback
      */
-    public function onBeforeWriteCallback(callable $callback)
+    public function onBeforeWriteCallback($callback)
     {
         $this->beforeWriteCallbacks[] = $callback;
     }
@@ -48,7 +48,7 @@ class WriteCallbackExtension extends DataExtension
     /**
      * @param callable $callback
      */
-    public function onAfterWriteCallback(callable $callback)
+    public function onAfterWriteCallback($callback)
     {
         $this->afterWriteCallbacks[] = $callback;
     }
@@ -56,7 +56,7 @@ class WriteCallbackExtension extends DataExtension
     /**
      * @param callable $callback
      */
-    public function onAfterExistsCallback(callable $callback)
+    public function onAfterExistsCallback($callback)
     {
         $dataObjectRecordProperty = new ReflectionProperty('DataObject', 'record');
         $dataObjectRecordProperty->setAccessible(true);

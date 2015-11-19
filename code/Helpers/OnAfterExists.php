@@ -23,7 +23,7 @@ class OnAfterExists
     /**
      * @param callable $callback
      */
-    public function __construct(callable $callback)
+    public function __construct($callback)
     {
         $this->objects = new ArrayObject();
         $this->callback = $callback;
@@ -44,7 +44,7 @@ class OnAfterExists
      * @param $objects
      * @param callable $callback
      */
-    public function addCondition($objects, callable $callback = null)
+    public function addCondition($objects, $callback = null)
     {
         if ($objects instanceof DataObject) {
             $objects = array($objects);
