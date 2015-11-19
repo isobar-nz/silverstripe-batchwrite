@@ -3,12 +3,11 @@ php:
  - 5.4
  - 5.5
  - 5.6
- - 7.0
 
 env:
  matrix:
-   - DB=MYSQL CORE_RELEASE=3.1
-   - DB=MYSQL CORE_RELEASE=3.2
+  - DB=MYSQL CORE_RELEASE=3.1
+  - DB=MYSQL CORE_RELEASE=3.2
 
 before_script:
  - phpenv rehash
