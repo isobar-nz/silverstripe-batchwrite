@@ -1,4 +1,6 @@
 <?php
+use BatchWrite\MySQLiAdapter;
+use BatchWrite\PDOAdapter;
 
 /**
  * Class Batch
@@ -21,6 +23,11 @@ class Batch
     private $relations = array();
 
     /**
+     * @var MySQLiAdapter|PDOAdapter
+     */
+    private $adapter;
+
+    /**
      *
      */
     public function __construct()
@@ -30,6 +37,40 @@ class Batch
 
         $this->dataObjectRecordProperty = new ReflectionProperty('DataObject', 'record');
         $this->dataObjectRecordProperty->setAccessible(true);
+        $this->adapter = $this->getAdapter();
+    }
+
+    /**
+     * @return MySQLiAdapter|PDOAdapter
+     * @throws Exception
+     */
+    private function getAdapter()
+    {
+        // version >= 3.2
+        if (class_exists('MySQLiConnector') && class_exists('PDOConnector')) {
+            $connector = DB::get_connector();
+            if ($connector instanceof MySQLiConnector) {
+                $connProperty = new ReflectionProperty('MySQLiConnector', 'dbConn');
+                $connProperty->setAccessible(true);
+                $conn = $connProperty->getValue($connector);
+                return new MySQLiAdapter($conn);
+            } else if ($connector instanceof PDOConnector) {
+                $connProperty = new ReflectionProperty('PDOConnector', 'pdoConnection');
+                $connProperty->setAccessible(true);
+                $conn = $connProperty->getValue($connector);
+                return new PDOAdapter($conn);
+            }
+        } else {
+            $db = DB::getConn();
+            if ($db instanceof MySQLDatabase) {
+                $connProperty = new ReflectionProperty('MySQLDatabase', 'dbConn');
+                $connProperty->setAccessible(true);
+                $conn = $connProperty->getValue();
+                return new MySQLiAdapter($conn);
+            }
+        }
+
+        throw new Exception('connection cannot be found');
     }
 
     /**
