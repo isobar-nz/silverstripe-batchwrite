@@ -68,13 +68,17 @@ class Batch
         }
 
         foreach ($dataObjects as $dataObject) {
-            $dataObject->onBeforeWrite();
+            $onBeforeWriteMethod = new ReflectionMethod($dataObject, 'onBeforeWrite');
+            $onBeforeWriteMethod->setAccessible(true);
+            $onBeforeWriteMethod->invoke($dataObject);
         }
 
         $this->writeTablePostfix($dataObjects);
 
         foreach ($dataObjects as $dataObject) {
-            $dataObject->onAfterWrite();
+            $onBeforeWriteMethod = new ReflectionMethod($dataObject, 'onAfterWrite');
+            $onBeforeWriteMethod->setAccessible(true);
+            $onBeforeWriteMethod->invoke($dataObject);
         }
     }
 

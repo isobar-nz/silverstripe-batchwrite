@@ -58,12 +58,11 @@ class WriteCallbackExtension extends DataExtension
      */
     public function onAfterExistsCallback(callable $callback)
     {
-        $dataObjectRecordProperty = new ReflectionProperty('DataObject', 'record');
-        $dataObjectRecordProperty->setAccessible(true);
-        $fields = $dataObjectRecordProperty->getValue($this->owner);
-        if (!empty($fields['ID'])) {
+        // if object exists already then call immediately
+        if ($this->owner->getField('ID')) {
             $callback($this->owner);
         } else {
+            // otherwise wait until it's written
             $this->onAfterWriteCallback($callback);
         }
     }

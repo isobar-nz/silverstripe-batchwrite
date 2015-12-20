@@ -33,7 +33,8 @@ class PDOAdapter implements DBAdapter
     public function query($sql, $params)
     {
         $stmt = $this->conn->prepare($sql);
-        return $stmt->execute($params);
+        $res = $stmt->execute($params);
+        return $res;
     }
 
     /**
@@ -58,10 +59,27 @@ class PDOAdapter implements DBAdapter
             array_unshift($fields, 'ID');
         }
 
+        $fieldObjects = array();
+        foreach ($fields as $field) {
+            $fieldObjects[$field] = $singleton->dbObject($field);
+        }
+
         $params = array();
         foreach ($objects as $object) {
             foreach ($fields as $field) {
-                $params[] = $object->getField($field);
+                $value = $object->getField($field);
+                // need to fill in null values with appropriate values
+                // TODO is there a better way to figure out if a value needs to be filled in?
+                if ($value === null) {
+                    if ($fieldObjects[$field] instanceof \Int ||
+                        $fieldObjects[$field] instanceof \Decimal ||
+                        $fieldObjects[$field] instanceof \Float) {
+                        $value = 0;
+                    } else {
+                        $value = '';
+                    }
+                }
+                $params[] = $value;
             }
         }
 

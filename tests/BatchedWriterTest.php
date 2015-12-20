@@ -190,7 +190,7 @@ class BatchedWriterTest extends \SapphireTest
             $this->assertEquals(0, DogPage::get()->Count());
         }
     }
-//
+
 //    public static function tearDownAfterClass()
 //    {
 //        parent::tearDownAfterClass();
