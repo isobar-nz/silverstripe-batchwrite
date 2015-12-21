@@ -91,10 +91,12 @@ class MySQLiAdapter implements DBAdapter
             }
         }
 
+        $typeString = '';
         $params = array();
         foreach ($objects as $obj) {
             foreach ($fields as $field) {
                 $type = $typeLookup[$field];
+                $typeString .= $type;
                 $value = $obj->getField($field);
                 if ($type === 'i') {
                     $value = intval($value);
@@ -106,6 +108,7 @@ class MySQLiAdapter implements DBAdapter
                 $params[] = $value;
             }
         }
+        array_unshift($params, $typeString);
 
         $table = $className . ($tablePostfix ? '_' . $tablePostfix : '');
 
@@ -138,7 +141,7 @@ class MySQLiAdapter implements DBAdapter
      */
     public function insertManyMany($sql, $params)
     {
-        array_unshift($params, array_fill(0, count($params), 'i'));
+        array_unshift($params, implode('', array_fill(0, count($params), 'i')));
         return $this->query($sql, $params);
     }
 }
