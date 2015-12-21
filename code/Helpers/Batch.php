@@ -31,7 +31,7 @@ class Batch
      */
     private function getAdapter()
     {
-        // version >= 3.2
+        // SS version >= 3.2
         if (class_exists('MySQLiConnector') && class_exists('PDOConnector')) {
             $connector = DB::get_connector();
             if ($connector instanceof MySQLiConnector) {
@@ -50,7 +50,7 @@ class Batch
             if ($db instanceof MySQLDatabase) {
                 $connProperty = new ReflectionProperty('MySQLDatabase', 'dbConn');
                 $connProperty->setAccessible(true);
-                $conn = $connProperty->getValue();
+                $conn = $connProperty->getValue($db);
                 return new MySQLiAdapter($conn);
             }
         }
