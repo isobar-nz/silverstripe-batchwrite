@@ -19,10 +19,21 @@ class Batch
 
     /**
      *
+     * @var int @@auto_increment_increment for the MySQL server
+     */
+    private static $autoIncrementIncrement;
+
+    /**
+     *
      */
     public function __construct()
     {
         $this->adapter = $this->getAdapter();
+        if(!isset(self::$autoIncrementIncrement)){
+            $result = \DB::query('SELECT @@auto_increment_increment as increment');
+            $row = $result->first();
+            self::$autoIncrementIncrement = intval($row['increment']);
+        }
     }
 
     /**
@@ -155,7 +166,7 @@ class Batch
                     $id = intval($row['ID']);
                     foreach ($objects as $obj) {
                         $obj->setField('ID', $id);
-                        $id++;
+                        $id += self::$autoIncrementIncrement;
                     }
                 }
 
