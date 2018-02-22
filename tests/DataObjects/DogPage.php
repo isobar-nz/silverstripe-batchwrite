@@ -17,6 +17,6 @@ class DogPage extends \DataObject implements \TestOnly
     );
 
     private static $extensions = [
-        \Versioned::class,
+        "Versioned('Stage', 'Live')",
     ];
 }
