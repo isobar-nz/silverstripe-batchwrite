@@ -3,6 +3,8 @@
 namespace LittleGiant\SilverStripe\BatchWrite\Helpers;
 
 use Exception;
+use LittleGiant\SilverStripe\BatchWrite\Adapters\MySQLiAdapter;
+use LittleGiant\SilverStripe\BatchWrite\Adapters\PDOAdapter;
 use ReflectionMethod;
 use ReflectionProperty;
 use SilverStripe\ORM\Connect\MySQLDatabase;

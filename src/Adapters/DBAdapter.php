@@ -1,10 +1,10 @@
 <?php
 
-namespace LittleGiant\SilverStripe\BatchWrite\Helpers;
+namespace LittleGiant\SilverStripe\BatchWrite\Adapters;
 
 /**
  * Interface DBAdapter
- * @package BatchWrite
+ * @package LittleGiant\SilverStripe\BatchWrite\Adapters
  */
 interface DBAdapter
 {
