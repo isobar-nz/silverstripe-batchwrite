@@ -26,7 +26,8 @@
         "silverstripe/framework": "^4.0"
     },
     "require-dev": {
-        "silverstripe/versioned": "^1"
+        "silverstripe/versioned": "^1",
+        "phpunit/phpunit": "^5.7"
     },
     "autoload": {
         "psr-4": {
