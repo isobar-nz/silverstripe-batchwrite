@@ -10,6 +10,7 @@ use ReflectionProperty;
 use SilverStripe\ORM\Connect\MySQLDatabase;
 use SilverStripe\ORM\Connect\MySQLiConnector;
 use SilverStripe\ORM\Connect\PDOConnector;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBField;
@@ -54,24 +55,23 @@ class Batch
      */
     private function getAdapter()
     {
-        // SS version >= 3.2
-        if (class_exists('MySQLiConnector') && class_exists('PDOConnector')) {
+        if (class_exists(MySQLiConnector::class) && class_exists(PDOConnector::class)) {
             $connector = DB::get_connector();
             if ($connector instanceof MySQLiConnector) {
-                $connProperty = new ReflectionProperty('MySQLiConnector', 'dbConn');
+                $connProperty = new ReflectionProperty(MySQLiConnector::class, 'dbConn');
                 $connProperty->setAccessible(true);
                 $conn = $connProperty->getValue($connector);
                 return new MySQLiAdapter($conn);
             } else if ($connector instanceof PDOConnector) {
-                $connProperty = new ReflectionProperty('PDOConnector', 'pdoConnection');
+                $connProperty = new ReflectionProperty(PDOConnector::class, 'pdoConnection');
                 $connProperty->setAccessible(true);
                 $conn = $connProperty->getValue($connector);
                 return new PDOAdapter($conn);
             }
         } else {
-            $db = DB::getConn();
+            $db = DB::get_conn();
             if ($db instanceof MySQLDatabase) {
-                $connProperty = new ReflectionProperty('MySQLDatabase', 'dbConn');
+                $connProperty = new ReflectionProperty(MySQLDatabase::class, 'dbConn');
                 $connProperty->setAccessible(true);
                 $conn = $connProperty->getValue($db);
                 return new MySQLiAdapter($conn);
@@ -131,7 +131,7 @@ class Batch
     }
 
     /**
-     * @param $dataObjects
+     * @param DataList|DataObject[] $dataObjects
      * @param string $postfix
      * @return mixed
      */
@@ -162,7 +162,7 @@ class Batch
             foreach ($actions as $action => $objects) {
                 $classSingleton = singleton($className);
                 $ancestry = array_filter($classSingleton->getClassAncestry(), function ($class) {
-                    return DataObject::has_own_table($class);
+                    return DataObject::getSchema()->classHasTable($class);
                 });
 
                 $rootClass = array_shift($ancestry);
@@ -194,7 +194,7 @@ class Batch
     }
 
     /**
-     * @param $sets
+     * @param DataObject[][] $sets
      * @throws Exception
      */
     public function writeManyMany($sets)
@@ -246,7 +246,7 @@ class Batch
     }
 
     /**
-     * @param $parent
+     * @param DataObject $parent
      * @param $relation
      * @return array
      */
@@ -277,7 +277,7 @@ class Batch
     }
 
     /**
-     * @param $dataObjects
+     * @param DataList|DataObject[] $dataObjects
      */
     public function delete($dataObjects)
     {
@@ -302,7 +302,7 @@ class Batch
     }
 
     /**
-     * @param $dataObjects
+     * @param DataList|DataObject[] $dataObjects
      */
     public function deleteFromStage($dataObjects)
     {
@@ -351,7 +351,7 @@ class Batch
 
         $singleton = singleton($className);
         $ancestry = array_reverse(array_filter($singleton->getClassAncestry(), function ($class) {
-            return DataObject::has_own_table($class);
+            return DataObject::getSchema()->classHasTable($class);
         }));
 
         $field = DBField::create_field('Int', null, 'ID');

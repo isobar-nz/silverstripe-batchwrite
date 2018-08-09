@@ -3,6 +3,7 @@
 namespace LittleGiant\SilverStripe\BatchWrite\Adapters;
 
 use PDO;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDecimal;
 use SilverStripe\ORM\FieldType\DBFloat;
@@ -42,7 +43,7 @@ class PDOAdapter implements DBAdapter
 
     /**
      * @param $className
-     * @param $objects
+     * @param DataList|DataObject[] $objects
      * @param bool|false $setID
      * @param bool|false $isUpdate
      * @param string $tablePostfix
@@ -50,7 +51,7 @@ class PDOAdapter implements DBAdapter
      */
     public function insertClass($className, $objects, $setID = false, $isUpdate = false, $tablePostfix = '')
     {
-        $fields = DataObject::database_fields($className);
+        $fields = DataObject::getSchema()->databaseFields($className);
         $singleton = singleton($className);
 
         $fields = array_filter(array_keys($fields), function ($field) use ($singleton) {

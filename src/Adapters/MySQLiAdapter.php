@@ -4,6 +4,7 @@ namespace LittleGiant\SilverStripe\BatchWrite\Adapters;
 
 use Exception;
 use mysqli;
+use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDecimal;
@@ -51,12 +52,13 @@ class MySQLiAdapter implements DBAdapter
         }
 
         call_user_func_array(array($stmt, 'bind_param'), $refs);
-        $stmt->execute();
+
+        return $stmt->execute();
     }
 
     /**
      * @param $className
-     * @param $objects
+     * @param DataList|DataObject[] $objects
      * @param bool|false $setID
      * @param bool|false $isUpdate
      * @param string $tablePostfix
@@ -65,7 +67,7 @@ class MySQLiAdapter implements DBAdapter
      */
     public function insertClass($className, $objects, $setID = false, $isUpdate = false, $tablePostfix = '')
     {
-        $fields = DataObject::database_fields($className);
+        $fields = DataObject::getSchema()->databaseFields($className);
 
         $singleton = singleton($className);
 
@@ -132,7 +134,7 @@ class MySQLiAdapter implements DBAdapter
             $sql .= " ON DUPLICATE KEY UPDATE {$mappings}";
         }
 
-        $this->query($sql, $params);
+        return $this->query($sql, $params);
     }
 
     /**
