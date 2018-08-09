@@ -1,6 +1,6 @@
 <?php
 
-namespace BatchWrite;
+namespace LittleGiant\SilverStripe\BatchWrite\Helpers;
 
 use Exception;
 use mysqli;

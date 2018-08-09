@@ -27,5 +27,15 @@
     },
     "require-dev": {
         "silverstripe/versioned": "^1"
+    },
+    "autoload": {
+        "psr-4": {
+            "LittleGiant\\SilverStripe\\BatchWrite\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LittleGiant\\SilverStripe\\BatchWrite\\Tests\\": "tests/"
+        }
     }
 }

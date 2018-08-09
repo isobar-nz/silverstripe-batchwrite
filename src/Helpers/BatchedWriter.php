@@ -1,5 +1,8 @@
 <?php
 
+namespace LittleGiant\SilverStripe\BatchWrite\Helpers;
+
+use ReflectionProperty;
 use SilverStripe\ORM\DataObject;
 
 /**

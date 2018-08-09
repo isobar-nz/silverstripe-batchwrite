@@ -1,5 +1,7 @@
 <?php
 
+namespace LittleGiant\SilverStripe\BatchWrite\Extensions;
+
 use SilverStripe\ORM\DataExtension;
 
 /**

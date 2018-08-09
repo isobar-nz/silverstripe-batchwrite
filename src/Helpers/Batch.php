@@ -1,7 +1,10 @@
 <?php
 
-use BatchWrite\MySQLiAdapter;
-use BatchWrite\PDOAdapter;
+namespace LittleGiant\SilverStripe\BatchWrite\Helpers;
+
+use Exception;
+use ReflectionMethod;
+use ReflectionProperty;
 use SilverStripe\ORM\Connect\MySQLDatabase;
 use SilverStripe\ORM\Connect\MySQLiConnector;
 use SilverStripe\ORM\Connect\PDOConnector;

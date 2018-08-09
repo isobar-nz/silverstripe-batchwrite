@@ -1,5 +1,9 @@
 <?php
 
+namespace LittleGiant\SilverStripe\BatchWrite\Helpers;
+
+use ReflectionProperty;
+
 /**
  * Class QuickDataObject
  */
