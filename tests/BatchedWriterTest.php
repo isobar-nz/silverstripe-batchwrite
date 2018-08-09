@@ -166,26 +166,25 @@ class BatchedWriterTest extends SapphireTest
                 $pages[] = $page;
             }
 
-            $writer->writeToStage($pages, 'Stage');
+            $writer->writeToStage($pages, Versioned::DRAFT);
             $writer->finish();
 
-            $currentStage = Versioned::current_stage();
+            Versioned::withVersionedMode(function () {
+                Versioned::set_stage(Versioned::DRAFT);
+                $this->assertEquals(100, DogPage::get()->Count());
+            });
 
-            Versioned::reading_stage('Stage');
-            $this->assertEquals(100, DogPage::get()->Count());
+            Versioned::withVersionedMode(function () use ($writer, $pages) {
+                Versioned::set_stage(Versioned::LIVE);
+                $this->assertEquals(0, DogPage::get()->Count());
 
-            Versioned::reading_stage('Live');
-            $this->assertEquals(0, DogPage::get()->Count());
+                $writer->writeToStage($pages, Versioned::LIVE);
+                $writer->finish();
 
-            $writer->writeToStage($pages, 'Live');
-            $writer->finish();
+                $this->assertEquals(100, DogPage::get()->Count());
+            });
 
-            Versioned::reading_stage('Live');
-            $this->assertEquals(100, DogPage::get()->Count());
-
-            Versioned::reading_stage($currentStage);
-
-            $writer->deleteFromStage($pages, 'Stage', 'Live');
+            $writer->deleteFromStage($pages, Versioned::DRAFT, Versioned::LIVE);
             $writer->finish();
 
             $this->assertEquals(0, DogPage::get()->Count());

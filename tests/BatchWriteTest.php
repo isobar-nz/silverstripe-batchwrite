@@ -49,7 +49,7 @@ class BatchWriteTest extends SapphireTest
         $animal->Country = 'Africa';
 
         $batch = new Batch();
-        $batch->write(array($animal));
+        $batch->write([$animal]);
 
         $this->assertTrue($animal->exists());
         $this->assertEquals(1, $animal->ID);
@@ -61,7 +61,7 @@ class BatchWriteTest extends SapphireTest
      */
     public function testBatchWrite_WriteLotsObjects_ObjectsExist()
     {
-        $animals = array();
+        $animals = [];
 
         for ($i = 0; $i < 100; $i++) {
             $animal = new Animal();
@@ -86,7 +86,7 @@ class BatchWriteTest extends SapphireTest
      */
     public function testBatchWrite_NestedObjects_ObjectsExist()
     {
-        $dogs = array();
+        $dogs = [];
 
         for ($i = 0; $i < 100; $i++) {
             $dog = new Dog();
@@ -110,7 +110,7 @@ class BatchWriteTest extends SapphireTest
 
         foreach (Animal::get() as $i => $dog) {
             $this->assertEquals('Bob ' . $i, $dog->Name);
-            $this->assertEquals('Brown #'. $i, $dog->Color);
+            $this->assertEquals('Brown #' . $i, $dog->Color);
         }
     }
 
@@ -125,7 +125,7 @@ class BatchWriteTest extends SapphireTest
         $cat->HasClaws = true;
 
         $batch = new Batch();
-        $batch->write(array($cat));
+        $batch->write([$cat]);
 
         $this->assertTrue($cat->exists());
         $this->assertEquals(1, $cat->ID);
@@ -149,10 +149,10 @@ class BatchWriteTest extends SapphireTest
         $dog->Color = 'Brown';
 
         $batch = new Batch();
-        $batch->write(array($dog));
+        $batch->write([$dog]);
 
+        /** @var Dog|null $dog */
         $dog = Dog::get()->byID($dog->ID);
-
         $this->assertEquals('Jimmy', $dog->Name);
         $this->assertEquals('Trotter', $dog->Type);
         $this->assertEquals('Brown', $dog->Color);
@@ -168,22 +168,23 @@ class BatchWriteTest extends SapphireTest
         $page->Author = 'Mr Scruffy';
 
         $batch = new Batch();
-        $batch->writeToStage(array($page), 'Stage');
+        $batch->writeToStage([$page], Versioned::DRAFT);
         $this->assertEquals(1, $page->ID);
 
-        $currentStage = Versioned::current_stage();
+        Versioned::withVersionedMode(function () {
+            Versioned::set_stage(Versioned::DRAFT);
+            /** @var DogPage|null $page */
+            $page = DogPage::get()->first();
+            $this->assertNotNull($page);
+            $this->assertEquals('I Love Dogs', $page->Title);
+            $this->assertEquals('Mr Scruffy', $page->Author);
+        });
 
-        Versioned::reading_stage('Stage');
-        $page = DogPage::get()->first();
-        $this->assertNotNull($page);
-        $this->assertEquals('I Love Dogs', $page->Title);
-        $this->assertEquals('Mr Scruffy', $page->Author);
-
-        Versioned::reading_stage('Live');
-        $page = DogPage::get()->first();
-        $this->assertNull($page);
-
-        Versioned::reading_stage($currentStage);
+        Versioned::withVersionedMode(function () {
+            Versioned::set_stage(Versioned::LIVE);
+            $page = DogPage::get()->first();
+            $this->assertNull($page);
+        });
     }
 
     /**
@@ -196,22 +197,23 @@ class BatchWriteTest extends SapphireTest
         $page->Author = 'Mrs Tu tu';
 
         $batch = new Batch();
-        $batch->writeToStage(array($page), 'Live');
+        $batch->writeToStage([$page], 'Live');
         $this->assertEquals(1, $page->ID);
 
-        $currentStage = Versioned::current_stage();
+        Versioned::withVersionedMode(function () {
+            Versioned::set_stage(Versioned::DRAFT);
+            $page = DogPage::get()->first();
+            $this->assertNull($page);
+        });
 
-        Versioned::reading_stage('Stage');
-        $page = DogPage::get()->first();
-        $this->assertNull($page);
-
-        Versioned::reading_stage('Live');
-        $page = DogPage::get()->first();
-        $this->assertNotNull($page);
-        $this->assertEquals('I Hate Bones', $page->Title);
-        $this->assertEquals('Mrs Tu tu', $page->Author);
-
-        Versioned::reading_stage($currentStage);
+        Versioned::withVersionedMode(function () {
+            Versioned::set_stage(Versioned::LIVE);
+            /** @var DogPage|null $page */
+            $page = DogPage::get()->first();
+            $this->assertNotNull($page);
+            $this->assertEquals('I Hate Bones', $page->Title);
+            $this->assertEquals('Mrs Tu tu', $page->Author);
+        });
     }
 
     /**
@@ -224,24 +226,26 @@ class BatchWriteTest extends SapphireTest
         $page->Author = 'Woof Woof';
 
         $batch = new Batch();
-        $batch->writeToStage(array($page), 'Stage', 'Live');
+        $batch->writeToStage([$page], Versioned::DRAFT, Versioned::LIVE);
         $this->assertEquals(1, $page->ID);
 
-        $currentStage = Versioned::current_stage();
+        Versioned::withVersionedMode(function () {
+            Versioned::set_stage(Versioned::DRAFT);
+            /** @var DogPage|null $page */
+            $page = DogPage::get()->first();
+            $this->assertNotNull($page);
+            $this->assertEquals('WOOF', $page->Title);
+            $this->assertEquals('Woof Woof', $page->Author);
+        });
 
-        Versioned::reading_stage('Stage');
-        $page = DogPage::get()->first();
-        $this->assertNotNull($page);
-        $this->assertEquals('WOOF', $page->Title);
-        $this->assertEquals('Woof Woof', $page->Author);
-
-        Versioned::reading_stage('Live');
-        $page = DogPage::get()->first();
-        $this->assertNotNull($page);
-        $this->assertEquals('WOOF', $page->Title);
-        $this->assertEquals('Woof Woof', $page->Author);
-
-        Versioned::reading_stage($currentStage);
+        Versioned::withVersionedMode(function () {
+            Versioned::set_stage(Versioned::LIVE);
+            /** @var DogPage|null $page */
+            $page = DogPage::get()->first();
+            $this->assertNotNull($page);
+            $this->assertEquals('WOOF', $page->Title);
+            $this->assertEquals('Woof Woof', $page->Author);
+        });
     }
 
     /**
@@ -258,15 +262,17 @@ class BatchWriteTest extends SapphireTest
         $cat->HasClaws = true;
 
         $batch = new Batch();
-        $batch->write(array($dog, $cat));
+        $batch->write([$dog, $cat]);
 
         $this->assertTrue($dog->exists());
         $this->assertTrue($cat->exists());
 
+        /** @var Dog|null $dog */
         $dog = Dog::get()->first();
         $this->assertEquals('Snuffins', $dog->Name);
         $this->assertEquals('Red', $dog->Color);
 
+        /** @var Cat|null $cat */
         $cat = Cat::get()->first();
         $this->assertEquals('Puff daddy', $cat->Name);
         $this->assertEquals(1, $cat->HasClaws);

@@ -100,30 +100,25 @@ class BatchDeleteTest extends SapphireTest
         for ($i = 0; $i < 100; $i++) {
             $page = new DogPage();
             $page->Title = 'Hero Dog ' . $i;
-            $page->writeToStage('Stage');
-            $page->publish('Stage', 'Live');
+            $page->writeToStage(Versioned::DRAFT);
+            $page->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
             $pages[] = $page;
         }
 
         $batch = new Batch();
 
-        $currentStage = Versioned::current_stage();
-        Versioned::reading_stage('Live');
+        Versioned::withVersionedMode(function () use ($batch, $pages) {
+            Versioned::set_stage(Versioned::LIVE);
+            $this->assertEquals(100, DogPage::get()->Count());
+            $batch->deleteFromStage($pages, Versioned::LIVE);
+            $this->assertEquals(0, DogPage::get()->Count());
+        });
 
-        $this->assertEquals(100, DogPage::get()->Count());
-
-        $batch->deleteFromStage($pages, 'Live');
-
-        $this->assertEquals(0, DogPage::get()->Count());
-
-        Versioned::reading_stage('Stage');
-
-        $this->assertEquals(100, DogPage::get()->Count());
-
-        $batch->deleteFromStage($pages, 'Stage');
-
-        $this->assertEquals(0, DogPage::get()->Count());
-
-        Versioned::reading_stage($currentStage);
+        Versioned::withVersionedMode(function () use ($batch, $pages) {
+            Versioned::set_stage(Versioned::DRAFT);
+            $this->assertEquals(100, DogPage::get()->Count());
+            $batch->deleteFromStage($pages, Versioned::DRAFT);
+            $this->assertEquals(0, DogPage::get()->Count());
+        });
     }
 }
