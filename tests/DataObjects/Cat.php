@@ -3,6 +3,8 @@
 namespace BatchWrite\Tests;
 
 use SilverStripe\Dev\TestOnly;
+use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBVarchar;
 
 /**
  * Class Cat
@@ -23,17 +25,17 @@ class Cat extends Animal implements TestOnly
     /**
      * @var array
      */
-    private static $db = array(
-        'Type' => 'Varchar',
-        'HasClaws' => 'Boolean',
-    );
+    private static $db = [
+        'Type'     => DBVarchar::class,
+        'HasClaws' => DBBoolean::class,
+    ];
 
     /**
      * @var array
      */
-    private static $has_one = array(
-        'Enemy' => 'BatchWrite\Tests\Dog',
-    );
+    private static $has_one = [
+        'Enemy' => Dog::class,
+    ];
 
     /**
      *

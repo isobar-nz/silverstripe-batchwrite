@@ -4,6 +4,7 @@ namespace BatchWrite\Tests;
 
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBVarchar;
 
 /**
  * Class Human
@@ -14,14 +15,14 @@ class Human extends DataObject implements TestOnly
     /**
      * @var array
      */
-    private static $db = array(
-        'Name' => 'Varchar',
-    );
+    private static $db = [
+        'Name' => DBVarchar::class,
+    ];
 
     /**
      * @var array
      */
-    private static $many_many = array(
-        'Children' => 'BatchWrite\Tests\Child',
-    );
+    private static $many_many = [
+        'Children' => Child::class,
+    ];
 }

@@ -3,6 +3,7 @@
 namespace BatchWrite\Tests;
 
 use SilverStripe\Dev\TestOnly;
+use SilverStripe\ORM\FieldType\DBVarchar;
 
 /**
  * Class Batman
@@ -13,7 +14,7 @@ class Batman extends Human implements TestOnly
     /**
      * @var array
      */
-    private static $db = array(
-        'Car' => 'Varchar',
-    );
+    private static $db = [
+        'Car' => DBVarchar::class,
+    ];
 }

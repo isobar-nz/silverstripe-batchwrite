@@ -4,6 +4,8 @@ namespace BatchWrite\Tests;
 
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBVarchar;
+use SilverStripe\Versioned\Versioned;
 
 /**
  * Class DogPage
@@ -14,12 +16,12 @@ class DogPage extends DataObject implements TestOnly
     /**
      * @var array
      */
-    private static $db = array(
-        'Title' => 'Varchar',
-        'Author' => 'Varchar',
-    );
+    private static $db = [
+        'Title'  => DBVarchar::class,
+        'Author' => DBVarchar::class,
+    ];
 
-    private static $extensions = array(
-        "Versioned('Stage', 'Live')"
-    );
+    private static $extensions = [
+        Versioned::class,
+    ];
 }
