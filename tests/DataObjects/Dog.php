@@ -13,7 +13,7 @@ class Dog extends Animal implements TestOnly
     /**
      * @var array
      */
-    public static $db = array(
+    private static $db = array(
         'Type' => 'Varchar',
         'Color' => 'Varchar',
     );
@@ -21,7 +21,7 @@ class Dog extends Animal implements TestOnly
     /**
      * @var array
      */
-    public static $has_one = array(
+    private static $has_one = array(
         'Owner' => 'BatchWrite\Tests\Human',
     );
 }

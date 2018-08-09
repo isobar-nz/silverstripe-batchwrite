@@ -14,7 +14,7 @@ class Animal extends DataObject implements TestOnly
     /**
      * @var array
      */
-    public static $db = array(
+    private static $db = array(
         'Name' => 'Varchar',
         'Country' => 'Varchar',
     );

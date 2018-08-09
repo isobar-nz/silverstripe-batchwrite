@@ -14,14 +14,14 @@ class Child extends DataObject implements TestOnly
     /**
      * @var array
      */
-    public static $db = array(
+    private static $db = array(
         'Name' => 'Varchar',
     );
 
     /**
      * @var array
      */
-    public static $belongs_many_many = array(
+    private static $belongs_many_many = array(
         'BelongsParent' => 'BatchWrite\Tests\Human',
     );
 }

@@ -14,7 +14,7 @@ class DogPage extends DataObject implements TestOnly
     /**
      * @var array
      */
-    public static $db = array(
+    private static $db = array(
         'Title' => 'Varchar',
         'Author' => 'Varchar',
     );
