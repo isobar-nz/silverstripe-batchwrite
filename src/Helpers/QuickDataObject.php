@@ -20,15 +20,11 @@ class QuickDataObject
      */
     public static function create($className)
     {
-        static $extensionInstanceProperty = null;
-
-        if (!$extensionInstanceProperty) {
-            $extensionInstanceProperty = new ReflectionProperty('Object', 'extension_instances');
-            $extensionInstanceProperty->setAccessible(true);
-        }
+        $extensionInstanceProperty = new ReflectionProperty($className, 'extension_instances');
+        $extensionInstanceProperty->setAccessible(true);
 
         if (!isset(self::$instances[$className])) {
-            self::$instances[$className] = new $className();
+            self::$instances[$className] = singleton($className);
         }
 
         $object = clone self::$instances[$className];

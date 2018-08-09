@@ -160,6 +160,7 @@ class Batch
 
         foreach ($types as $className => $actions) {
             foreach ($actions as $action => $objects) {
+                /** @var DataObject[] $objects */
                 $classSingleton = singleton($className);
                 $ancestry = array_filter($classSingleton->getClassAncestry(), function ($class) {
                     return DataObject::getSchema()->classHasTable($class);

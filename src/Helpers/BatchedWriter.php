@@ -68,7 +68,7 @@ class BatchedWriter
         $this->batch = new Batch();
         $this->batchSize = $batchSize;
 
-        $this->dataObjectRecordProperty = new ReflectionProperty('DataObject', 'record');
+        $this->dataObjectRecordProperty = new ReflectionProperty(DataObject::class, 'record');
         $this->dataObjectRecordProperty->setAccessible(true);
     }
 

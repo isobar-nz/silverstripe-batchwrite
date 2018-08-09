@@ -34,7 +34,7 @@ class OnAfterExists
         $this->objects = new ArrayObject();
         $this->callback = $callback;
 
-        $this->dataObjectRecordProperty = new ReflectionProperty('DataObject', 'record');
+        $this->dataObjectRecordProperty = new ReflectionProperty(DataObject::class, 'record');
         $this->dataObjectRecordProperty->setAccessible(true);
     }
 
