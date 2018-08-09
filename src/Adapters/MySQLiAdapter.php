@@ -39,7 +39,7 @@ class MySQLiAdapter implements DBAdapter
         $stmt = $this->conn->prepare($sql);
 
         if (!$stmt) {
-            throw new Exception('Invalid query: '. $sql);
+            throw new Exception("{$this->conn->error} in query {$sql}", $this->conn->errno);
         }
 
         $refs = array();
