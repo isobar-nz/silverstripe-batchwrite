@@ -152,6 +152,7 @@ class BatchedWriterTest extends SapphireTest
         $writer->write($children);
         $writer->finish();
 
+        /** @var Human $parent */
         $parent = Human::get()->first();
         $this->assertEquals(5, $parent->Children()->Count());
     }

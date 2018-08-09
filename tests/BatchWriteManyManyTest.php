@@ -72,6 +72,7 @@ class BatchWriteManyManyTest extends SapphireTest
         }
         $batch->writeManyMany($sets);
 
+        /** @var Human $parent */
         $parent = Human::get()->first();
         $this->assertEquals(5, $parent->Children()->Count());
     }

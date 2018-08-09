@@ -2,13 +2,20 @@
 
 namespace LittleGiant\BatchWrite\Tests\DataObjects;
 
+use LittleGiant\BatchWrite\Extensions\WriteCallbackExtension;
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBVarchar;
 
 /**
  * Class Cat
+ *
  * @package BatchWrite\Tests
+ * @property string $Type
+ * @property bool $HasClaws
+ * @property int $EnemyID
+ * @method Dog|null Enemy()
+ * @mixin WriteCallbackExtension
  */
 class Cat extends Animal implements TestOnly
 {

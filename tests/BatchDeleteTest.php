@@ -62,7 +62,7 @@ class BatchDeleteTest extends SapphireTest
             $dog = new Dog();
             $dog->Name = 'Pup ' . $i;
             $dog->Color = 'Fifty Shade No. ' . $i;
-            $dog->Owner($human);
+            $dog->OwnerID = $human->ID;
             $dog->write();
 
             $objects[] = $human;

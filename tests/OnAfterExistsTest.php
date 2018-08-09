@@ -155,6 +155,7 @@ class OnAfterExistsTest extends SapphireTest
         $batch->write(array($parent));
         $batch->write($children);
 
+        /** @var Human $parent */
         $parent = Human::get()->first();
         $this->assertEquals(5, $parent->Children()->Count());
     }
