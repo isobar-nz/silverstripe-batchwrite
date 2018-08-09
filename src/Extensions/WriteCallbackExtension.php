@@ -6,28 +6,26 @@ use SilverStripe\ORM\DataExtension;
 
 /**
  * Class WriteCallbackExtension
+ * @package LittleGiant\BatchWrite\Extensions
  */
 class WriteCallbackExtension extends DataExtension
 {
-    /**
-     * @var array
-     */
-    private $beforeWriteCallbacks = array();
-
-    /**
-     * @var array
-     */
-    private $afterWriteCallbacks = array();
+    const ON_BEFORE_WRITE_FIELD = self::class . '_onBeforeWriteCallbacks';
+    const ON_AFTER_WRITE_FIELD = self::class . '_onAfterWriteCallbacks';
 
     /**
      *
      */
     public function onBeforeWrite()
     {
-        foreach ($this->beforeWriteCallbacks as $callback) {
+        $callbackArray = $this->owner->getField(static::ON_BEFORE_WRITE_FIELD);
+        if (!$callbackArray instanceof \ArrayObject) return;
+
+        $runCallbacks = $callbackArray->exchangeArray([]);
+
+        foreach ($runCallbacks as $callback) {
             $callback($this->owner);
         }
-        $this->beforeWriteCallbacks = array();
     }
 
     /**
@@ -35,10 +33,14 @@ class WriteCallbackExtension extends DataExtension
      */
     public function onAfterWrite()
     {
-        foreach ($this->afterWriteCallbacks as $callback) {
+        $callbackArray = $this->owner->getField(static::ON_AFTER_WRITE_FIELD);
+        if (!$callbackArray instanceof \ArrayObject) return;
+
+        $runCallbacks = $callbackArray->exchangeArray([]);
+
+        foreach ($runCallbacks as $callback) {
             $callback($this->owner);
         }
-        $this->afterWriteCallbacks = array();
     }
 
     /**
@@ -46,7 +48,13 @@ class WriteCallbackExtension extends DataExtension
      */
     public function onBeforeWriteCallback(callable $callback)
     {
-        $this->beforeWriteCallbacks[] = $callback;
+        if (!$this->owner->hasField(static::ON_BEFORE_WRITE_FIELD)) {
+            $this->owner->setField(static::ON_BEFORE_WRITE_FIELD, new \ArrayObject());
+        }
+
+        /** @var \ArrayObject $callbackArray */
+        $callbackArray = $this->owner->getField(static::ON_BEFORE_WRITE_FIELD);
+        $callbackArray->append($callback);
     }
 
     /**
@@ -54,7 +62,13 @@ class WriteCallbackExtension extends DataExtension
      */
     public function onAfterWriteCallback(callable $callback)
     {
-        $this->afterWriteCallbacks[] = $callback;
+        if (!$this->owner->hasField(static::ON_AFTER_WRITE_FIELD)) {
+            $this->owner->setField(static::ON_AFTER_WRITE_FIELD, new \ArrayObject());
+        }
+
+        /** @var \ArrayObject $callbackArray */
+        $callbackArray = $this->owner->getField(static::ON_AFTER_WRITE_FIELD);
+        $callbackArray->append($callback);
     }
 
     /**
@@ -63,7 +77,7 @@ class WriteCallbackExtension extends DataExtension
     public function onAfterExistsCallback(callable $callback)
     {
         // if object exists already then call immediately
-        if ($this->owner->getField('ID')) {
+        if ($this->owner->isInDB()) {
             $callback($this->owner);
         } else {
             // otherwise wait until it's written

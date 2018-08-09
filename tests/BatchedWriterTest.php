@@ -25,7 +25,6 @@ class BatchedWriterTest extends BaseTest
         $batchSizes = [10, 30, 100, 300];
 
         foreach ($batchSizes as $size) {
-
             $owners = [];
             $dogs = [];
             $cats = [];
@@ -42,12 +41,12 @@ class BatchedWriterTest extends BaseTest
                 $cat = new Cat();
                 $cat->Name = 'Cat ' . $i;
 
-                $owner->onAfterExistsCallback(function ($owner) use ($dog, $writer) {
+                $owner->onAfterExistsCallback(function (Human $owner) use ($dog, $writer) {
                     $dog->OwnerID = $owner->ID;
                     $writer->write($dog);
                 });
 
-                $dog->onAfterExistsCallback(function ($dog) use ($cat, $writer) {
+                $dog->onAfterExistsCallback(function (Dog $dog) use ($cat, $writer) {
                     $cat->EnemyID = $dog->ID;
                     $writer->write($cat);
                 });
