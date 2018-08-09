@@ -1,6 +1,6 @@
 <?php
 
-namespace LittleGiant\SilverStripe\BatchWrite\Adapters;
+namespace LittleGiant\BatchWrite\Adapters;
 
 use Exception;
 use mysqli;
@@ -13,7 +13,7 @@ use SilverStripe\ORM\FieldType\DBMoney;
 
 /**
  * Class MySQLiAdapter
- * @package LittleGiant\SilverStripe\BatchWrite\Adapters
+ * @package LittleGiant\BatchWrite\Adapters
  */
 class MySQLiAdapter implements DBAdapter
 {

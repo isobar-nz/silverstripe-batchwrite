@@ -30,12 +30,12 @@
     },
     "autoload": {
         "psr-4": {
-            "LittleGiant\\SilverStripe\\BatchWrite\\": "src/"
+            "LittleGiant\\BatchWrite\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "LittleGiant\\SilverStripe\\BatchWrite\\Tests\\": "tests/"
+            "LittleGiant\\BatchWrite\\Tests\\": "tests/"
         }
     }
 }

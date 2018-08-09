@@ -2,6 +2,6 @@
 name: batchwrite
 ---
 
-DataObject:
+SilverStripe\ORM\DataObject:
   extensions:
-    - WriteCallbackExtension
+    - LittleGiant\WriteCallbackExtension

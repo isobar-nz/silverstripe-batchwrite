@@ -1,16 +1,20 @@
 <?php
 
-namespace BatchWrite\Tests;
+namespace LittleGiant\BatchWrite\Tests;
 
+use LittleGiant\BatchWrite\Helpers\Batch;
+use LittleGiant\BatchWrite\Tests\DataObjects\Animal;
+use LittleGiant\BatchWrite\Tests\DataObjects\Batman;
+use LittleGiant\BatchWrite\Tests\DataObjects\Cat;
+use LittleGiant\BatchWrite\Tests\DataObjects\Child;
+use LittleGiant\BatchWrite\Tests\DataObjects\Dog;
+use LittleGiant\BatchWrite\Tests\DataObjects\DogPage;
+use LittleGiant\BatchWrite\Tests\DataObjects\Human;
 use SilverStripe\Dev\SapphireTest;
 
 /**
  * Class BatchWriteManyManyTest
- * @package BatchWrite\Tests
- */
-/**
- * Class BatchWriteManyManyTest
- * @package BatchWrite\Tests
+ * @package LittleGiant\BatchWrite\Tests
  */
 class BatchWriteManyManyTest extends SapphireTest
 {
@@ -23,14 +27,14 @@ class BatchWriteManyManyTest extends SapphireTest
      * @var array
      */
     protected $extraDataObjects = array(
-        'BatchWrite\Tests\Animal',
-        'BatchWrite\Tests\Batman',
-        'BatchWrite\Tests\Cat',
-        'BatchWrite\Tests\Child',
-        'BatchWrite\Tests\Child',
-        'BatchWrite\Tests\Dog',
-        'BatchWrite\Tests\DogPage',
-        'BatchWrite\Tests\Human',
+        Animal::class,
+        Batman::class,
+        Cat::class,
+        Child::class,
+        Child::class,
+        Dog::class,
+        DogPage::class,
+        Human::class,
     );
 
     /**
@@ -57,7 +61,7 @@ class BatchWriteManyManyTest extends SapphireTest
             $children[] = $child;
         }
 
-        $batch = new \Batch();
+        $batch = new Batch();
 
         $batch->write(array($parent));
         $batch->write($children);

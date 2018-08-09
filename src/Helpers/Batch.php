@@ -1,10 +1,10 @@
 <?php
 
-namespace LittleGiant\SilverStripe\BatchWrite\Helpers;
+namespace LittleGiant\BatchWrite\Helpers;
 
 use Exception;
-use LittleGiant\SilverStripe\BatchWrite\Adapters\MySQLiAdapter;
-use LittleGiant\SilverStripe\BatchWrite\Adapters\PDOAdapter;
+use LittleGiant\BatchWrite\Adapters\MySQLiAdapter;
+use LittleGiant\BatchWrite\Adapters\PDOAdapter;
 use ReflectionMethod;
 use ReflectionProperty;
 use SilverStripe\ORM\Connect\MySQLDatabase;

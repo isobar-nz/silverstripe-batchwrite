@@ -1,17 +1,22 @@
 <?php
 
-namespace BatchWrite\Tests;
+namespace LittleGiant\BatchWrite\Tests;
 
+use LittleGiant\BatchWrite\Helpers\Batch;
+use LittleGiant\BatchWrite\Tests\DataObjects\Animal;
+use LittleGiant\BatchWrite\Tests\DataObjects\Batman;
+use LittleGiant\BatchWrite\Tests\DataObjects\Cat;
+use LittleGiant\BatchWrite\Tests\DataObjects\Child;
+use LittleGiant\BatchWrite\Tests\DataObjects\Dog;
+use LittleGiant\BatchWrite\Tests\DataObjects\DogPage;
+use LittleGiant\BatchWrite\Tests\DataObjects\Human;
 use SilverStripe\Dev\SapphireTest;
+use SilverStripe\ORM\ValidationException;
 use SilverStripe\Versioned\Versioned;
 
 /**
  * Class BatchWriteTest
- * @package BatchWrite\Tests
- */
-/**
- * Class BatchWriteTest
- * @package BatchWrite\Tests
+ * @package LittleGiant\BatchWrite\Tests
  */
 class BatchWriteTest extends SapphireTest
 {
@@ -23,16 +28,16 @@ class BatchWriteTest extends SapphireTest
     /**
      * @var array
      */
-    protected $extraDataObjects = array(
-        'BatchWrite\Tests\Animal',
-        'BatchWrite\Tests\Batman',
-        'BatchWrite\Tests\Cat',
-        'BatchWrite\Tests\Child',
-        'BatchWrite\Tests\Child',
-        'BatchWrite\Tests\Dog',
-        'BatchWrite\Tests\DogPage',
-        'BatchWrite\Tests\Human',
-    );
+    protected $extraDataObjects = [
+        Animal::class,
+        Batman::class,
+        Cat::class,
+        Child::class,
+        Child::class,
+        Dog::class,
+        DogPage::class,
+        Human::class,
+    ];
 
     /**
      * BatchWriteTest constructor.
@@ -51,7 +56,7 @@ class BatchWriteTest extends SapphireTest
         $animal->Name = 'Bob';
         $animal->Country = 'Africa';
 
-        $batch = new \Batch();
+        $batch = new Batch();
         $batch->write(array($animal));
 
         $this->assertTrue($animal->exists());
@@ -73,7 +78,7 @@ class BatchWriteTest extends SapphireTest
             $animals[] = $animal;
         }
 
-        $batch = new \Batch();
+        $batch = new Batch();
         $batch->write($animals);
 
         for ($i = 0; $i < 100; $i++) {
@@ -100,7 +105,7 @@ class BatchWriteTest extends SapphireTest
             $dogs[] = $dog;
         }
 
-        $batch = new \Batch();
+        $batch = new Batch();
         $batch->write($dogs);
 
         for ($i = 0; $i < 100; $i++) {
@@ -127,7 +132,7 @@ class BatchWriteTest extends SapphireTest
         $cat->Country = 'Canada';
         $cat->HasClaws = true;
 
-        $batch = new \Batch();
+        $batch = new Batch();
         $batch->write(array($cat));
 
         $this->assertTrue($cat->exists());
@@ -138,7 +143,7 @@ class BatchWriteTest extends SapphireTest
     }
 
     /**
-     * @throws \ValidationException
+     * @throws ValidationException
      * @throws null
      */
     public function testBatchWrite_ObjectExists_UpdatesObject()
@@ -151,7 +156,7 @@ class BatchWriteTest extends SapphireTest
         $dog->Name = 'Jimmy';
         $dog->Color = 'Brown';
 
-        $batch = new \Batch();
+        $batch = new Batch();
         $batch->write(array($dog));
 
         $dog = Dog::get()->byID($dog->ID);
@@ -170,7 +175,7 @@ class BatchWriteTest extends SapphireTest
         $page->Title = 'I Love Dogs';
         $page->Author = 'Mr Scruffy';
 
-        $batch = new \Batch();
+        $batch = new Batch();
         $batch->writeToStage(array($page), 'Stage');
         $this->assertEquals(1, $page->ID);
 
@@ -198,7 +203,7 @@ class BatchWriteTest extends SapphireTest
         $page->Title = 'I Hate Bones';
         $page->Author = 'Mrs Tu tu';
 
-        $batch = new \Batch();
+        $batch = new Batch();
         $batch->writeToStage(array($page), 'Live');
         $this->assertEquals(1, $page->ID);
 
@@ -226,7 +231,7 @@ class BatchWriteTest extends SapphireTest
         $page->Title = 'WOOF';
         $page->Author = 'Woof Woof';
 
-        $batch = new \Batch();
+        $batch = new Batch();
         $batch->writeToStage(array($page), 'Stage', 'Live');
         $this->assertEquals(1, $page->ID);
 
@@ -260,7 +265,7 @@ class BatchWriteTest extends SapphireTest
         $cat->Name = 'Puff daddy';
         $cat->HasClaws = true;
 
-        $batch = new \Batch();
+        $batch = new Batch();
         $batch->write(array($dog, $cat));
 
         $this->assertTrue($dog->exists());

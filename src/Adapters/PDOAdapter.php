@@ -1,6 +1,6 @@
 <?php
 
-namespace LittleGiant\SilverStripe\BatchWrite\Adapters;
+namespace LittleGiant\BatchWrite\Adapters;
 
 use PDO;
 use SilverStripe\ORM\DataObject;
@@ -10,7 +10,7 @@ use SilverStripe\ORM\FieldType\DBInt;
 
 /**
  * Class PDOAdapter
- * @package LittleGiant\SilverStripe\BatchWrite\Adapters
+ * @package LittleGiant\BatchWrite\Adapters
  */
 class PDOAdapter implements DBAdapter
 {

@@ -1,17 +1,22 @@
 <?php
 
-namespace BatchWrite\Tests;
+namespace LittleGiant\BatchWrite\Tests;
 
+use LittleGiant\BatchWrite\Helpers\BatchedWriter;
+use LittleGiant\BatchWrite\Helpers\OnAfterExists;
+use LittleGiant\BatchWrite\Tests\DataObjects\Animal;
+use LittleGiant\BatchWrite\Tests\DataObjects\Batman;
+use LittleGiant\BatchWrite\Tests\DataObjects\Cat;
+use LittleGiant\BatchWrite\Tests\DataObjects\Child;
+use LittleGiant\BatchWrite\Tests\DataObjects\Dog;
+use LittleGiant\BatchWrite\Tests\DataObjects\DogPage;
+use LittleGiant\BatchWrite\Tests\DataObjects\Human;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\Versioned\Versioned;
 
 /**
  * Class BatchedWriterTest
- * @package BatchWrite\Tests
- */
-/**
- * Class BatchedWriterTest
- * @package BatchWrite\Tests
+ * @package LittleGiant\BatchWrite\Tests
  */
 class BatchedWriterTest extends SapphireTest
 {
@@ -23,16 +28,16 @@ class BatchedWriterTest extends SapphireTest
     /**
      * @var array
      */
-    protected $extraDataObjects = array(
-        'BatchWrite\Tests\Animal',
-        'BatchWrite\Tests\Batman',
-        'BatchWrite\Tests\Cat',
-        'BatchWrite\Tests\Child',
-        'BatchWrite\Tests\Child',
-        'BatchWrite\Tests\Dog',
-        'BatchWrite\Tests\DogPage',
-        'BatchWrite\Tests\Human',
-    );
+    protected $extraDataObjects = [
+        Animal::class,
+        Batman::class,
+        Cat::class,
+        Child::class,
+        Child::class,
+        Dog::class,
+        DogPage::class,
+        Human::class,
+    ];
 
     /**
      * BatchedWriterTest constructor.
@@ -47,15 +52,15 @@ class BatchedWriterTest extends SapphireTest
      */
     public function testWrite_WriteObjects_ObjectsWritten()
     {
-        $batchSizes = array(10, 30, 100, 300);
+        $batchSizes = [10, 30, 100, 300];
 
         foreach ($batchSizes as $size) {
 
-            $owners = array();
-            $dogs = array();
-            $cats = array();
+            $owners = [];
+            $dogs = [];
+            $cats = [];
 
-            $writer = new \BatchedWriter($size);
+            $writer = new BatchedWriter($size);
 
             for ($i = 0; $i < 100; $i++) {
                 $owner = new Human();
@@ -127,23 +132,23 @@ class BatchedWriterTest extends SapphireTest
         $parent = new Human();
         $parent->Name = 'Bob';
 
-        $children = array();
+        $children = [];
         for ($i = 0; $i < 5; $i++) {
             $child = new Child();
             $child->Name = 'Soldier #' . $i;
             $children[] = $child;
         }
 
-        $writer = new \BatchedWriter();
+        $writer = new BatchedWriter();
 
-        $afterExists = new \OnAfterExists(function () use($writer, $parent, $children) {
+        $afterExists = new OnAfterExists(function () use ($writer, $parent, $children) {
             $writer->writeManyMany($parent, 'Children', $children);
         });
 
         $afterExists->addCondition($parent);
         $afterExists->addCondition($children);
 
-        $writer->write(array($parent));
+        $writer->write([$parent]);
         $writer->write($children);
         $writer->finish();
 
@@ -156,15 +161,15 @@ class BatchedWriterTest extends SapphireTest
      */
     public function testWriteToStages_ManyPages_WritesObjectsToStage()
     {
-        $sizes = array(10, 30, 100, 300);
+        $sizes = [10, 30, 100, 300];
 
         foreach ($sizes as $size) {
-            $writer = new \BatchedWriter($size);
+            $writer = new BatchedWriter($size);
 
-            $pages = array();
+            $pages = [];
             for ($i = 0; $i < 100; $i++) {
                 $page = new DogPage();
-                $page->Title = 'Wonder Pup  '. $i;
+                $page->Title = 'Wonder Pup  ' . $i;
                 $pages[] = $page;
             }
 

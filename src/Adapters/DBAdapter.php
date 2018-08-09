@@ -1,13 +1,13 @@
 <?php
 
-namespace LittleGiant\SilverStripe\BatchWrite\Adapters;
+namespace LittleGiant\BatchWrite\Adapters;
 
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 
 /**
  * Interface DBAdapter
- * @package LittleGiant\SilverStripe\BatchWrite\Adapters
+ * @package LittleGiant\BatchWrite\Adapters
  */
 interface DBAdapter
 {

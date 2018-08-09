@@ -1,6 +1,6 @@
 <?php
 
-namespace BatchWrite\Tests;
+namespace LittleGiant\BatchWrite\Tests\DataObjects;
 
 use SilverStripe\Dev\TestOnly;
 use SilverStripe\ORM\FieldType\DBBoolean;

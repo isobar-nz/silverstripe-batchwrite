@@ -1,17 +1,22 @@
 <?php
 
-namespace BatchWrite\Tests;
+namespace LittleGiant\BatchWrite\Tests;
 
+use LittleGiant\BatchWrite\Helpers\Batch;
+use LittleGiant\BatchWrite\Helpers\OnAfterExists;
+use LittleGiant\BatchWrite\Tests\DataObjects\Animal;
+use LittleGiant\BatchWrite\Tests\DataObjects\Batman;
+use LittleGiant\BatchWrite\Tests\DataObjects\Cat;
+use LittleGiant\BatchWrite\Tests\DataObjects\Child;
+use LittleGiant\BatchWrite\Tests\DataObjects\Dog;
+use LittleGiant\BatchWrite\Tests\DataObjects\DogPage;
+use LittleGiant\BatchWrite\Tests\DataObjects\Human;
 use SilverStripe\Dev\SapphireTest;
 use SilverStripe\ORM\ValidationException;
 
 /**
  * Class OnAfterExistsTest
- * @package BatchWrite\Tests
- */
-/**
- * Class OnAfterExistsTest
- * @package BatchWrite\Tests
+ * @package LittleGiant\BatchWrite\Tests
  */
 class OnAfterExistsTest extends SapphireTest
 {
@@ -23,16 +28,16 @@ class OnAfterExistsTest extends SapphireTest
     /**
      * @var array
      */
-    protected $extraDataObjects = array(
-        'BatchWrite\Tests\Animal',
-        'BatchWrite\Tests\Batman',
-        'BatchWrite\Tests\Cat',
-        'BatchWrite\Tests\Child',
-        'BatchWrite\Tests\Child',
-        'BatchWrite\Tests\Dog',
-        'BatchWrite\Tests\DogPage',
-        'BatchWrite\Tests\Human',
-    );
+    protected $extraDataObjects = [
+        Animal::class,
+        Batman::class,
+        Cat::class,
+        Child::class,
+        Child::class,
+        Dog::class,
+        DogPage::class,
+        Human::class,
+    ];
 
     /**
      * OnAfterExistsTest constructor.
@@ -54,7 +59,7 @@ class OnAfterExistsTest extends SapphireTest
         $owner = new Human();
         $owner->Name = 'Bob';
 
-        $afterExists = new \OnAfterExists(function () use ($dog) {
+        $afterExists = new OnAfterExists(function () use ($dog) {
             $dog->write();
         });
 
@@ -86,7 +91,7 @@ class OnAfterExistsTest extends SapphireTest
         $cat = new Cat();
         $cat->Name = 'Agnis';
 
-        $afterExists = new \OnAfterExists(function () use ($dog) {
+        $afterExists = new OnAfterExists(function () use ($dog) {
             $dog->write();
         });
 
@@ -134,9 +139,9 @@ class OnAfterExistsTest extends SapphireTest
             $children[] = $child;
         }
 
-        $batch = new \Batch();
+        $batch = new Batch();
 
-        $afterExists = new \OnAfterExists(function () use($batch, $parent, $children) {
+        $afterExists = new OnAfterExists(function () use($batch, $parent, $children) {
             $sets = array();
             foreach ($children as $child) {
                 $sets[] = array($parent, 'Children', $child);

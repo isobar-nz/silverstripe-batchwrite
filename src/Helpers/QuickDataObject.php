@@ -1,6 +1,6 @@
 <?php
 
-namespace LittleGiant\SilverStripe\BatchWrite\Helpers;
+namespace LittleGiant\BatchWrite\Helpers;
 
 use ReflectionProperty;
 
