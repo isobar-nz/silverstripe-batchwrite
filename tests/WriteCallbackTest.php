@@ -2,41 +2,16 @@
 
 namespace LittleGiant\BatchWrite\Tests;
 
-use LittleGiant\BatchWrite\Tests\DataObjects\Animal;
-use LittleGiant\BatchWrite\Tests\DataObjects\Batman;
-use LittleGiant\BatchWrite\Tests\DataObjects\Cat;
-use LittleGiant\BatchWrite\Tests\DataObjects\Child;
 use LittleGiant\BatchWrite\Tests\DataObjects\Dog;
-use LittleGiant\BatchWrite\Tests\DataObjects\DogPage;
 use LittleGiant\BatchWrite\Tests\DataObjects\Human;
-use SilverStripe\Dev\SapphireTest;
 use SilverStripe\ORM\ValidationException;
 
 /**
  * Class WriteCallbackTest
  * @package LittleGiant\BatchWrite\Tests
  */
-class WriteCallbackTest extends SapphireTest
+class WriteCallbackTest extends BaseTest
 {
-    /**
-     * @var bool
-     */
-    protected $usesDatabase = true;
-
-    /**
-     * @var array
-     */
-    protected $extraDataObjects = array(
-        Animal::class,
-        Batman::class,
-        Cat::class,
-        Child::class,
-        Child::class,
-        Dog::class,
-        DogPage::class,
-        Human::class,
-    );
-
     /**
      * @throws ValidationException
      * @throws null
@@ -105,14 +80,14 @@ class WriteCallbackTest extends SapphireTest
         $owner->Name = 'Hilly Stewart';
         $owner->write();
 
-        $owner->onAfterExistsCallback(function ($owner) use ($dog1)  {
+        $owner->onAfterExistsCallback(function ($owner) use ($dog1) {
             $dog1->OwnerID = $owner->ID;
             $dog1->write();
         });
 
         $owner->write();
 
-        $owner->onAfterExistsCallback(function ($owner) use ($dog2)  {
+        $owner->onAfterExistsCallback(function ($owner) use ($dog2) {
             $dog2->OwnerID = $owner->ID;
             $dog2->write();
         });

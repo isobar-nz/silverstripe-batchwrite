@@ -4,41 +4,18 @@ namespace LittleGiant\BatchWrite\Tests;
 
 use LittleGiant\BatchWrite\Helpers\Batch;
 use LittleGiant\BatchWrite\Helpers\OnAfterExists;
-use LittleGiant\BatchWrite\Tests\DataObjects\Animal;
-use LittleGiant\BatchWrite\Tests\DataObjects\Batman;
 use LittleGiant\BatchWrite\Tests\DataObjects\Cat;
 use LittleGiant\BatchWrite\Tests\DataObjects\Child;
 use LittleGiant\BatchWrite\Tests\DataObjects\Dog;
-use LittleGiant\BatchWrite\Tests\DataObjects\DogPage;
 use LittleGiant\BatchWrite\Tests\DataObjects\Human;
-use SilverStripe\Dev\SapphireTest;
 use SilverStripe\ORM\ValidationException;
 
 /**
  * Class OnAfterExistsTest
  * @package LittleGiant\BatchWrite\Tests
  */
-class OnAfterExistsTest extends SapphireTest
+class OnAfterExistsTest extends BaseTest
 {
-    /**
-     * @var bool
-     */
-    protected $usesDatabase = true;
-
-    /**
-     * @var array
-     */
-    protected $extraDataObjects = [
-        Animal::class,
-        Batman::class,
-        Cat::class,
-        Child::class,
-        Child::class,
-        Dog::class,
-        DogPage::class,
-        Human::class,
-    ];
-
     /**
      * @throws ValidationException
      * @throws null
@@ -55,7 +32,7 @@ class OnAfterExistsTest extends SapphireTest
             $dog->write();
         });
 
-        $afterExists->addCondition($owner, function ($owner) use($dog) {
+        $afterExists->addCondition($owner, function ($owner) use ($dog) {
             $dog->OwnerID = $owner->ID;
         });
 
@@ -87,17 +64,17 @@ class OnAfterExistsTest extends SapphireTest
             $dog->write();
         });
 
-        $afterExists->addCondition($owner1, function ($owner) use($dog) {
+        $afterExists->addCondition($owner1, function ($owner) use ($dog) {
             $dog->Name .= ' ' . $owner->Name;
             $dog->OwnerID = $owner->ID;
         });
 
-        $afterExists->addCondition($owner2, function ($owner) use($dog) {
+        $afterExists->addCondition($owner2, function ($owner) use ($dog) {
             $dog->Name .= ' ' . $owner->Name;
             $dog->OwnerID = $owner->ID;
         });
 
-        $afterExists->addCondition($cat, function ($cat) use($dog) {
+        $afterExists->addCondition($cat, function ($cat) use ($dog) {
             $dog->Name .= ' ' . $cat->Name;
         });
 
@@ -124,7 +101,7 @@ class OnAfterExistsTest extends SapphireTest
         $parent = new Human();
         $parent->Name = 'Bob';
 
-        $children = array();
+        $children = [];
         for ($i = 0; $i < 5; $i++) {
             $child = new Child();
             $child->Name = 'Soldier #' . $i;
@@ -133,10 +110,10 @@ class OnAfterExistsTest extends SapphireTest
 
         $batch = new Batch();
 
-        $afterExists = new OnAfterExists(function () use($batch, $parent, $children) {
-            $sets = array();
+        $afterExists = new OnAfterExists(function () use ($batch, $parent, $children) {
+            $sets = [];
             foreach ($children as $child) {
-                $sets[] = array($parent, 'Children', $child);
+                $sets[] = [$parent, 'Children', $child];
             }
             $batch->writeManyMany($sets);
         });
@@ -144,7 +121,7 @@ class OnAfterExistsTest extends SapphireTest
         $afterExists->addCondition($parent);
         $afterExists->addCondition($children);
 
-        $batch->write(array($parent));
+        $batch->write([$parent]);
         $batch->write($children);
 
         /** @var Human $parent */
