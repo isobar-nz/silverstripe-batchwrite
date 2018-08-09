@@ -38,14 +38,6 @@ class BatchWriteManyManyTest extends SapphireTest
     );
 
     /**
-     * BatchWriteManyManyTest constructor.
-     */
-    public function __construct()
-    {
-        $this->setUpOnce();
-    }
-
-    /**
      *
      */
     public function testWriteManyMany_CreateParentAndChildren_WritesManyMany()
@@ -76,10 +68,4 @@ class BatchWriteManyManyTest extends SapphireTest
         $parent = Human::get()->first();
         $this->assertEquals(5, $parent->Children()->Count());
     }
-//
-//    public static function tearDownAfterClass()
-//    {
-//        parent::tearDownAfterClass();
-//        \SapphireTest::delete_all_temp_dbs();
-//    }
 }

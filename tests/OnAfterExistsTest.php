@@ -40,14 +40,6 @@ class OnAfterExistsTest extends SapphireTest
     ];
 
     /**
-     * OnAfterExistsTest constructor.
-     */
-    public function __construct()
-    {
-        $this->setUpOnce();
-    }
-
-    /**
      * @throws ValidationException
      * @throws null
      */
@@ -159,10 +151,4 @@ class OnAfterExistsTest extends SapphireTest
         $parent = Human::get()->first();
         $this->assertEquals(5, $parent->Children()->Count());
     }
-//
-//    public static function tearDownAfterClass()
-//    {
-//        parent::tearDownAfterClass();
-//        \SapphireTest::delete_all_temp_dbs();
-//    }
 }

@@ -40,14 +40,6 @@ class BatchDeleteTest extends SapphireTest
     ];
 
     /**
-     * BatchDeleteTest constructor.
-     */
-    public function __construct()
-    {
-        $this->setUpOnce();
-    }
-
-    /**
      * @throws ValidationException
      * @throws null
      */
@@ -134,10 +126,4 @@ class BatchDeleteTest extends SapphireTest
 
         Versioned::reading_stage($currentStage);
     }
-//
-//    public static function tearDownAfterClass()
-//    {
-//        parent::tearDownAfterClass();
-//        \SapphireTest::delete_all_temp_dbs();
-//    }
 }

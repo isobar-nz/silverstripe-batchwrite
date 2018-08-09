@@ -40,14 +40,6 @@ class BatchedWriterTest extends SapphireTest
     ];
 
     /**
-     * BatchedWriterTest constructor.
-     */
-    public function __construct()
-    {
-        $this->setUpOnce();
-    }
-
-    /**
      *
      */
     public function testWrite_WriteObjects_ObjectsWritten()
@@ -199,10 +191,4 @@ class BatchedWriterTest extends SapphireTest
             $this->assertEquals(0, DogPage::get()->Count());
         }
     }
-
-//    public static function tearDownAfterClass()
-//    {
-//        parent::tearDownAfterClass();
-//        \SapphireTest::delete_all_temp_dbs();
-//    }
 }

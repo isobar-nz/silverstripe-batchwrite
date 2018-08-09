@@ -38,14 +38,6 @@ class WriteCallbackTest extends SapphireTest
     );
 
     /**
-     * WriteCallbackTest constructor.
-     */
-    public function __construct()
-    {
-        $this->setUpOnce();
-    }
-
-    /**
      * @throws ValidationException
      * @throws null
      */
@@ -133,10 +125,4 @@ class WriteCallbackTest extends SapphireTest
         $this->assertEquals($owner->ID, $dog1->OwnerID);
         $this->assertEquals($owner->ID, $dog2->OwnerID);
     }
-
-//    public static function tearDownAfterClass()
-//    {
-//        parent::tearDownAfterClass();
-//        \SapphireTest::delete_all_temp_dbs();
-//    }
 }
