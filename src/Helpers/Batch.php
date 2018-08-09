@@ -210,7 +210,7 @@ class Batch
         $types = array();
 
         foreach ($sets as $set) {
-            $types[$set[0]->class][$set[2]->class][] = $set;
+            $types[$set[0]->ClassName][$set[2]->ClassName][] = $set;
         }
 
         foreach ($types as $className => $belongs) {

@@ -82,7 +82,8 @@ class BatchedWriter
         }
 
         foreach ($dataObjects as $object) {
-            $className = $object->class;
+            /** @var DataObject $object */
+            $className = $object->ClassName;
             $record = $this->dataObjectRecordProperty->getValue($object);
             $id = !empty($record['ID']) ? $record['ID'] : 0;
 
@@ -129,7 +130,8 @@ class BatchedWriter
         }
 
         foreach ($dataObjects as $object) {
-            $className = $object->class;
+            /** @var DataObject $object */
+            $className = $object->ClassName;
             $record = $this->dataObjectRecordProperty->getValue($object);
             $id = !empty($record['ID']) ? $record['ID'] : 0;
 
@@ -173,13 +175,13 @@ class BatchedWriter
     }
 
     /**
-     * @param $object
+     * @param DataObject $object
      * @param $relation
      * @param $belongs
      */
     public function writeManyMany($object, $relation, $belongs)
     {
-        $className = $object->class;
+        $className = $object->ClassName;
 
         foreach ($belongs as $belong) {
             $this->manyManyBatches[$className][$relation][] = array($object, $relation, $belong);
@@ -196,12 +198,12 @@ class BatchedWriter
     }
 
     /**
-     * @param $objects
+     * @param DataObject[] $objects
      */
     public function delete($objects)
     {
         foreach ($objects as $object) {
-            $className = $object->class;
+            $className = $object->ClassName;
             $record = $this->dataObjectRecordProperty->getValue($object);
             $id = !empty($record['ID']) ? $record['ID'] : 0;
             $this->deleteBatches[$className][] = $id;
@@ -236,7 +238,7 @@ class BatchedWriter
     }
 
     /**
-     * @param $objects
+     * @param DataObject[] $objects
      * @param $stage
      */
     public function deleteFromStage($objects, $stage)
@@ -245,7 +247,7 @@ class BatchedWriter
 
         foreach ($stages as $stage) {
             foreach ($objects as $object) {
-                $className = $object->class;
+                $className = $object->ClassName;
                 $record = $this->dataObjectRecordProperty->getValue($object);
                 $id = !empty($record['ID']) ? $record['ID'] : 0;
 
