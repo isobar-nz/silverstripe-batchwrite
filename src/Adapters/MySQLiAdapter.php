@@ -57,7 +57,7 @@ class MySQLiAdapter implements DBAdapter
      */
     public function insertClass($className, $objects, $setID = false, $isUpdate = false, $tablePostfix = '')
     {
-        $fields = DataObject::getSchema()->databaseFields($className);
+        $fields = DataObject::getSchema()->databaseFields($className, false);
 
         /** @var DataObject $singleton */
         $singleton = singleton($className);
@@ -66,8 +66,8 @@ class MySQLiAdapter implements DBAdapter
             return DataObject::getSchema()->databaseField($singleton, $field, false);
         });
 
-        if ($setID || $isUpdate) {
-            array_unshift($fields, 'ID');
+        if (!$setID && !$isUpdate) {
+            unset($fields['ID']);
         }
 
         // types need to be set
@@ -104,7 +104,7 @@ class MySQLiAdapter implements DBAdapter
         }
         array_unshift($params, $typeString);
 
-        $table = $className . ($tablePostfix ? '_' . $tablePostfix : '');
+        $table = DataObject::getSchema()->tableName($className) . ($tablePostfix ? '_' . $tablePostfix : '');
 
         $columns = implode(', ', array_map(function ($name) {
             return "`{$name}`";

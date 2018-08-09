@@ -3,10 +3,12 @@
 namespace LittleGiant\BatchWrite\Helpers;
 
 use Exception;
+use http\Exception\RuntimeException;
 use LittleGiant\BatchWrite\Adapters\MySQLiAdapter;
 use LittleGiant\BatchWrite\Adapters\PDOAdapter;
 use ReflectionMethod;
 use ReflectionProperty;
+use SilverStripe\Core\ClassInfo;
 use SilverStripe\ORM\Connect\MySQLDatabase;
 use SilverStripe\ORM\Connect\MySQLiConnector;
 use SilverStripe\ORM\Connect\PDOConnector;
@@ -14,6 +16,8 @@ use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
 use SilverStripe\ORM\FieldType\DBField;
+use SilverStripe\ORM\FieldType\DBInt;
+use SilverStripe\Versioned\Versioned;
 
 /**
  * Class Batch
@@ -155,19 +159,18 @@ class Batch
             }
             $dataObject->setField('LastEdited', $date);
 
-            $types[$dataObject->class][$action][] = $dataObject;
+            $types[$dataObject->ClassName][$action][] = $dataObject;
         }
 
         foreach ($types as $className => $actions) {
+            $classSingleton = singleton($className);
+            $ancestry = array_filter($classSingleton->getClassAncestry(), function ($class) {
+                return DataObject::getSchema()->classHasTable($class);
+            });
+            $rootClass = array_shift($ancestry);
+
             foreach ($actions as $action => $objects) {
                 /** @var DataObject[] $objects */
-                $classSingleton = singleton($className);
-                $ancestry = array_filter($classSingleton->getClassAncestry(), function ($class) {
-                    return DataObject::getSchema()->classHasTable($class);
-                });
-
-                $rootClass = array_shift($ancestry);
-
                 $this->adapter->insertClass($rootClass, $objects, false, $action === 'update', $postfix);
 
                 if ($action === 'insert') {
@@ -253,28 +256,20 @@ class Batch
      */
     private function getRelationFields($parent, $relation)
     {
-        if (isset($this->relations[$parent->class][$relation])) {
-            return $this->relations[$parent->class][$relation];
+        if (isset($this->relations[$parent->ClassName][$relation])) {
+            return $this->relations[$parent->ClassName][$relation];
         }
 
-        $ancestry = $parent->getClassAncestry();
-        foreach ($ancestry as $parentClass) {
-            $singleton = singleton($parentClass);
-            $manyMany = $singleton->many_many();
+        $dataObjectSchema = DataObject::getSchema();
+        $manyMany = $dataObjectSchema->manyManyComponent($parent, $relation);
 
-            if (isset($manyMany[$relation])) {
-                $belongsClass = $manyMany[$relation];
-                if ($belongsClass ===  $parentClass) {
-                    $belongsClass = 'Child';
-                }
-                $relationFields = array($parentClass . '_' . $relation, $parentClass . 'ID', $belongsClass . 'ID');
-                $this->relations[$parent->class][$relation] = $relationFields;
-                return $relationFields;
-            }
+        if ($manyMany === null) {
+            throw new RuntimeException(); // TODO
         }
 
-        // doesn't exist, should throw error
-        return array($parent->class . 'ID', $relation, $parent->class . 'ID');
+        $relationFields = [$manyMany['join'], $manyMany['parentField'], $manyMany['childField']];
+        $this->relations[$parent->ClassName][$relation] = $relationFields;
+        return $relationFields;
     }
 
     /**
@@ -285,7 +280,7 @@ class Batch
         $types = array();
 
         foreach ($dataObjects as $dataObject) {
-            $types[$dataObject->class][] = $dataObject->getField('ID');
+            $types[$dataObject->ClassName][] = $dataObject->getField('ID');
         }
 
         foreach ($types as $className => $ids) {
@@ -312,7 +307,7 @@ class Batch
         $types = array();
 
         foreach ($dataObjects as $dataObject) {
-            $types[$dataObject->class][] = $dataObject->getField('ID');
+            $types[$dataObject->ClassName][] = $dataObject->getField('ID');
         }
 
         foreach ($types as $className => $ids) {
@@ -346,23 +341,21 @@ class Batch
             return;
         }
 
-        if ($postfix === 'Stage') {
-            $postfix = '';
-        }
-
         $singleton = singleton($className);
-        $ancestry = array_reverse(array_filter($singleton->getClassAncestry(), function ($class) {
-            return DataObject::getSchema()->classHasTable($class);
+        $dataObjectSchema = DataObject::getSchema();
+        $ancestry = array_reverse(array_filter($singleton->getClassAncestry(), function ($class) use ($dataObjectSchema) {
+            return $dataObjectSchema->classHasTable($class);
         }));
 
-        $field = DBField::create_field('Int', null, 'ID');
+        $field = DBInt::create('ID');
         $ids = '(' . implode(', ', array_map(function ($id) use ($field) {
                 $id = $id instanceof DataObject ? $id->ID : $id;
                 return $field->prepValueForDB($id);
             }, $ids)) . ')';
 
+        $postfix = empty($postfix) || $postfix === Versioned::DRAFT ? '' : "_{$postfix}";
         foreach ($ancestry as $class) {
-            $table = $class . ($postfix ? '_' . $postfix : '');
+            $table = $dataObjectSchema->baseDataTable($class) . $postfix;
             $sql = "DELETE FROM `{$table}` WHERE ID IN {$ids}";
             DB::query($sql);
         }
