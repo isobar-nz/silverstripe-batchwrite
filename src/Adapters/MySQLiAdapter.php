@@ -33,10 +33,7 @@ class MySQLiAdapter implements DBAdapter
     }
 
     /**
-     * @param $sql
-     * @param $params
-     * @throws Exception
-     * @return bool
+     * @inheritdoc
      */
     public function query($sql, $params)
     {
@@ -57,13 +54,7 @@ class MySQLiAdapter implements DBAdapter
     }
 
     /**
-     * @param $className
-     * @param DataList|DataObject[] $objects
-     * @param bool|false $setID
-     * @param bool|false $isUpdate
-     * @param string $tablePostfix
-     * @throws Exception
-     * @return bool
+     * @inheritdoc
      */
     public function insertClass($className, $objects, $setID = false, $isUpdate = false, $tablePostfix = '')
     {
@@ -138,9 +129,7 @@ class MySQLiAdapter implements DBAdapter
     }
 
     /**
-     * @param $sql
-     * @param $params
-     * @return mixed
+     * @inheritdoc
      */
     public function insertManyMany($sql, $params)
     {

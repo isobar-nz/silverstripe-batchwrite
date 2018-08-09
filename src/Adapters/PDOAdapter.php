@@ -30,9 +30,7 @@ class PDOAdapter implements DBAdapter
     }
 
     /**
-     * @param $sql
-     * @param $params
-     * @return bool
+     * @inheritdoc
      */
     public function query($sql, $params)
     {
@@ -42,12 +40,7 @@ class PDOAdapter implements DBAdapter
     }
 
     /**
-     * @param $className
-     * @param DataList|DataObject[] $objects
-     * @param bool|false $setID
-     * @param bool|false $isUpdate
-     * @param string $tablePostfix
-     * @return bool
+     * @inheritdoc
      */
     public function insertClass($className, $objects, $setID = false, $isUpdate = false, $tablePostfix = '')
     {
@@ -115,9 +108,7 @@ class PDOAdapter implements DBAdapter
     }
 
     /**
-     * @param $sql
-     * @param $params
-     * @return mixed
+     * @inheritdoc
      */
     public function insertManyMany($sql, $params)
     {

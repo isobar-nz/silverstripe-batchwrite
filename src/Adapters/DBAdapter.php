@@ -2,6 +2,9 @@
 
 namespace LittleGiant\SilverStripe\BatchWrite\Adapters;
 
+use SilverStripe\ORM\DataList;
+use SilverStripe\ORM\DataObject;
+
 /**
  * Interface DBAdapter
  * @package LittleGiant\SilverStripe\BatchWrite\Adapters
@@ -9,26 +12,26 @@ namespace LittleGiant\SilverStripe\BatchWrite\Adapters;
 interface DBAdapter
 {
     /**
-     * @param $sql
-     * @param $params
-     * @return mixed
+     * @param string $sql
+     * @param array $params
+     * @return bool
      */
     public function query($sql, $params);
 
     /**
-     * @param $className
-     * @param $objects
-     * @param bool|false $setID
-     * @param bool|false $isUpdate
+     * @param string $className
+     * @param DataList|DataObject[] $objects
+     * @param bool $setID
+     * @param bool $isUpdate
      * @param string $tablePostfix
-     * @return mixed
+     * @return bool
      */
     public function insertClass($className, $objects, $setID = false, $isUpdate = false, $tablePostfix = '');
 
     /**
-     * @param $sql
-     * @param $params
-     * @return mixed
+     * @param string $sql
+     * @param array $params
+     * @return bool
      */
     public function insertManyMany($sql, $params);
 }
