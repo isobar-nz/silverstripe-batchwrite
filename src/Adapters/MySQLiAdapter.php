@@ -42,13 +42,7 @@ class MySQLiAdapter implements DBAdapter
             throw new Exception("{$this->conn->error} in query {$sql}", $this->conn->errno);
         }
 
-        $refs = array();
-        foreach ($params as $key => $value) {
-            $refs[$key] = &$params[$key];
-        }
-
-        call_user_func_array(array($stmt, 'bind_param'), $refs);
-
+        $stmt->bind_param(...$params);
         return $stmt->execute();
     }
 
@@ -57,14 +51,8 @@ class MySQLiAdapter implements DBAdapter
      */
     public function insertClass($className, $objects, $setID = false, $isUpdate = false, $tablePostfix = '')
     {
-        $fields = DataObject::getSchema()->databaseFields($className, false);
-
-        /** @var DataObject $singleton */
-        $singleton = singleton($className);
-
-        $fields = array_filter(array_keys($fields), function ($field) use ($singleton) {
-            return DataObject::getSchema()->databaseField($singleton, $field, false);
-        });
+        $dataObjectSchema = DataObject::getSchema();
+        $fields = $dataObjectSchema->databaseFields($className, false);
 
         if (!$setID && !$isUpdate) {
             unset($fields['ID']);
@@ -74,17 +62,17 @@ class MySQLiAdapter implements DBAdapter
         $typeLookup = array(
             'ID' => 'i',
         );
-        foreach ($fields as $field) {
-            $dbObject = $singleton->dbObject($field);
-            if ($dbObject instanceof DBBoolean || $dbObject instanceof DBInt) {
+        foreach ($fields as $field => $type) {
+            if ($type === DBBoolean::class || $type === DBInt::class) {
                 $typeLookup[$field] = 'i';
-            } else if ($dbObject instanceof DBFloat || $dbObject instanceof DBDecimal || $dbObject instanceof DBMoney) {
+            } else if ($type === DBFloat::class || $type === DBDecimal::class || $type === DBMoney::class) {
                 $typeLookup[$field] = 'd';
             } else {
                 $typeLookup[$field] = 's';
             }
         }
 
+        $fields = array_keys($fields);
         $typeString = '';
         $params = array();
         foreach ($objects as $obj) {
@@ -104,11 +92,9 @@ class MySQLiAdapter implements DBAdapter
         }
         array_unshift($params, $typeString);
 
-        $table = DataObject::getSchema()->tableName($className) . ($tablePostfix ? '_' . $tablePostfix : '');
-
-        $columns = implode(', ', array_map(function ($name) {
-            return "`{$name}`";
-        }, $fields));
+        $tablePostfix = empty($tablePostfix) ? '' : "_{$tablePostfix}";
+        $table = $dataObjectSchema->tableName($className) . $tablePostfix;
+        $columns = '`' . implode('`,`', $fields) . '`';
 
         // inserts
         $inserts = implode(',', array_fill(0, count($objects), '(' . implode(',', array_fill(0, count($fields), '?')) . ')'));
