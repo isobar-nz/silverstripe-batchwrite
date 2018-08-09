@@ -3,7 +3,6 @@
 namespace LittleGiant\SilverStripe\BatchWrite\Adapters;
 
 use PDO;
-use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDecimal;
 use SilverStripe\ORM\FieldType\DBFloat;

@@ -4,7 +4,6 @@ namespace LittleGiant\SilverStripe\BatchWrite\Adapters;
 
 use Exception;
 use mysqli;
-use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDecimal;
@@ -60,10 +59,11 @@ class MySQLiAdapter implements DBAdapter
     {
         $fields = DataObject::getSchema()->databaseFields($className);
 
+        /** @var DataObject $singleton */
         $singleton = singleton($className);
 
         $fields = array_filter(array_keys($fields), function ($field) use ($singleton) {
-            return $singleton->hasOwnTableDatabaseField($field);
+            return DataObject::getSchema()->databaseField($singleton, $field, false);
         });
 
         if ($setID || $isUpdate) {
