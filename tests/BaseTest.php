@@ -10,6 +10,8 @@ use LittleGiant\BatchWrite\Tests\DataObjects\Dog;
 use LittleGiant\BatchWrite\Tests\DataObjects\DogPage;
 use LittleGiant\BatchWrite\Tests\DataObjects\Human;
 use SilverStripe\Dev\SapphireTest;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
 
 /**
  * Class BaseTest
@@ -34,4 +36,18 @@ abstract class BaseTest extends SapphireTest
      * @var bool
      */
     protected $usesDatabase = true;
+
+    /**
+     * @inheritdoc
+     */
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        foreach (static::$extra_dataobjects as $dataobject) {
+            // TODO fix tests requiring fresh table every time
+            $table = DataObject::getSchema()->baseDataTable($dataobject);
+            DB::query("TRUNCATE {$table}");
+        }
+    }
 }
