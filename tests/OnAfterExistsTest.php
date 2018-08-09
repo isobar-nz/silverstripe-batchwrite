@@ -2,6 +2,9 @@
 
 namespace BatchWrite\Tests;
 
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\ORM\ValidationException;
+
 /**
  * Class OnAfterExistsTest
  * @package BatchWrite\Tests
@@ -10,7 +13,7 @@ namespace BatchWrite\Tests;
  * Class OnAfterExistsTest
  * @package BatchWrite\Tests
  */
-class OnAfterExistsTest extends \SapphireTest
+class OnAfterExistsTest extends SapphireTest
 {
     /**
      * @var bool
@@ -40,7 +43,7 @@ class OnAfterExistsTest extends \SapphireTest
     }
 
     /**
-     * @throws \ValidationException
+     * @throws ValidationException
      * @throws null
      */
     public function testCallback_OneCondition_CalledBack()
@@ -66,7 +69,7 @@ class OnAfterExistsTest extends \SapphireTest
     }
 
     /**
-     * @throws \ValidationException
+     * @throws ValidationException
      * @throws null
      */
     public function testCallback_ManyConditions_CalledBack()

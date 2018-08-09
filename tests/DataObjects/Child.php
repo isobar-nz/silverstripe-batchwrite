@@ -2,11 +2,14 @@
 
 namespace BatchWrite\Tests;
 
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\ORM\DataObject;
+
 /**
  * Class Child
  * @package BatchWrite\Tests
  */
-class Child extends \DataObject implements \TestOnly
+class Child extends DataObject implements TestOnly
 {
     /**
      * @var array

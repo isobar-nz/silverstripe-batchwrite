@@ -2,6 +2,10 @@
 
 namespace BatchWrite\Tests;
 
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\ORM\ValidationException;
+use SilverStripe\Versioned\Versioned;
+
 /**
  * Class BatchDeleteTest
  * @package BatchWrite\Tests
@@ -10,7 +14,7 @@ namespace BatchWrite\Tests;
  * Class BatchDeleteTest
  * @package BatchWrite\Tests
  */
-class BatchDeleteTest extends \SapphireTest
+class BatchDeleteTest extends SapphireTest
 {
     /**
      * @var bool
@@ -40,7 +44,7 @@ class BatchDeleteTest extends \SapphireTest
     }
 
     /**
-     * @throws \ValidationException
+     * @throws ValidationException
      * @throws null
      */
     public function testBranchDelete_DeleteManyObjects_ObjectsDeleted()
@@ -69,7 +73,7 @@ class BatchDeleteTest extends \SapphireTest
     }
 
     /**
-     * @throws \ValidationException
+     * @throws ValidationException
      * @throws null
      */
     public function testBranchDeleteIDs_DeleteManyIDs_ObjectsDeleted()
@@ -107,8 +111,8 @@ class BatchDeleteTest extends \SapphireTest
 
         $batch = new \Batch();
 
-        $currentStage = \Versioned::current_stage();
-        \Versioned::reading_stage('Live');
+        $currentStage = Versioned::current_stage();
+        Versioned::reading_stage('Live');
 
         $this->assertEquals(100, DogPage::get()->Count());
 
@@ -116,7 +120,7 @@ class BatchDeleteTest extends \SapphireTest
 
         $this->assertEquals(0, DogPage::get()->Count());
 
-        \Versioned::reading_stage('Stage');
+        Versioned::reading_stage('Stage');
 
         $this->assertEquals(100, DogPage::get()->Count());
 
@@ -124,7 +128,7 @@ class BatchDeleteTest extends \SapphireTest
 
         $this->assertEquals(0, DogPage::get()->Count());
 
-        \Versioned::reading_stage($currentStage);
+        Versioned::reading_stage($currentStage);
     }
 //
 //    public static function tearDownAfterClass()

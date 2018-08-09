@@ -2,11 +2,13 @@
 
 namespace BatchWrite\Tests;
 
+use SilverStripe\Dev\TestOnly;
+
 /**
  * Class Dog
  * @package BatchWrite\Tests
  */
-class Dog extends Animal implements \TestOnly
+class Dog extends Animal implements TestOnly
 {
     /**
      * @var array

@@ -2,6 +2,9 @@
 
 namespace BatchWrite\Tests;
 
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Versioned\Versioned;
+
 /**
  * Class BatchWriteTest
  * @package BatchWrite\Tests
@@ -10,7 +13,7 @@ namespace BatchWrite\Tests;
  * Class BatchWriteTest
  * @package BatchWrite\Tests
  */
-class BatchWriteTest extends \SapphireTest
+class BatchWriteTest extends SapphireTest
 {
     /**
      * @var bool
@@ -171,19 +174,19 @@ class BatchWriteTest extends \SapphireTest
         $batch->writeToStage(array($page), 'Stage');
         $this->assertEquals(1, $page->ID);
 
-        $currentStage = \Versioned::current_stage();
+        $currentStage = Versioned::current_stage();
 
-        \Versioned::reading_stage('Stage');
+        Versioned::reading_stage('Stage');
         $page = DogPage::get()->first();
         $this->assertNotNull($page);
         $this->assertEquals('I Love Dogs', $page->Title);
         $this->assertEquals('Mr Scruffy', $page->Author);
 
-        \Versioned::reading_stage('Live');
+        Versioned::reading_stage('Live');
         $page = DogPage::get()->first();
         $this->assertNull($page);
 
-        \Versioned::reading_stage($currentStage);
+        Versioned::reading_stage($currentStage);
     }
 
     /**
@@ -199,19 +202,19 @@ class BatchWriteTest extends \SapphireTest
         $batch->writeToStage(array($page), 'Live');
         $this->assertEquals(1, $page->ID);
 
-        $currentStage = \Versioned::current_stage();
+        $currentStage = Versioned::current_stage();
 
-        \Versioned::reading_stage('Stage');
+        Versioned::reading_stage('Stage');
         $page = DogPage::get()->first();
         $this->assertNull($page);
 
-        \Versioned::reading_stage('Live');
+        Versioned::reading_stage('Live');
         $page = DogPage::get()->first();
         $this->assertNotNull($page);
         $this->assertEquals('I Hate Bones', $page->Title);
         $this->assertEquals('Mrs Tu tu', $page->Author);
 
-        \Versioned::reading_stage($currentStage);
+        Versioned::reading_stage($currentStage);
     }
 
     /**
@@ -227,21 +230,21 @@ class BatchWriteTest extends \SapphireTest
         $batch->writeToStage(array($page), 'Stage', 'Live');
         $this->assertEquals(1, $page->ID);
 
-        $currentStage = \Versioned::current_stage();
+        $currentStage = Versioned::current_stage();
 
-        \Versioned::reading_stage('Stage');
+        Versioned::reading_stage('Stage');
         $page = DogPage::get()->first();
         $this->assertNotNull($page);
         $this->assertEquals('WOOF', $page->Title);
         $this->assertEquals('Woof Woof', $page->Author);
 
-        \Versioned::reading_stage('Live');
+        Versioned::reading_stage('Live');
         $page = DogPage::get()->first();
         $this->assertNotNull($page);
         $this->assertEquals('WOOF', $page->Title);
         $this->assertEquals('Woof Woof', $page->Author);
 
-        \Versioned::reading_stage($currentStage);
+        Versioned::reading_stage($currentStage);
     }
 
     /**

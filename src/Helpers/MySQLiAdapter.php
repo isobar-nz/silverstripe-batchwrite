@@ -2,13 +2,14 @@
 
 namespace BatchWrite;
 
-use Boolean;
-use DataObject;
-use Decimal;
 use Exception;
-use Float;
-use Int;
 use mysqli;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBDecimal;
+use SilverStripe\ORM\FieldType\DBFloat;
+use SilverStripe\ORM\FieldType\DBInt;
+use SilverStripe\ORM\FieldType\DBMoney;
 
 /**
  * Class MySQLiAdapter
@@ -82,9 +83,9 @@ class MySQLiAdapter implements DBAdapter
         );
         foreach ($fields as $field) {
             $dbObject = $singleton->dbObject($field);
-            if ($dbObject instanceof Boolean || $dbObject instanceof Int) {
+            if ($dbObject instanceof DBBoolean || $dbObject instanceof DBInt) {
                 $typeLookup[$field] = 'i';
-            } else if ($dbObject instanceof Float || $dbObject instanceof Decimal || $dbObject instanceof Money) {
+            } else if ($dbObject instanceof DBFloat || $dbObject instanceof DBDecimal || $dbObject instanceof DBMoney) {
                 $typeLookup[$field] = 'd';
             } else {
                 $typeLookup[$field] = 's';

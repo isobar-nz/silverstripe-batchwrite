@@ -2,6 +2,9 @@
 
 namespace BatchWrite\Tests;
 
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\Versioned\Versioned;
+
 /**
  * Class BatchedWriterTest
  * @package BatchWrite\Tests
@@ -10,7 +13,7 @@ namespace BatchWrite\Tests;
  * Class BatchedWriterTest
  * @package BatchWrite\Tests
  */
-class BatchedWriterTest extends \SapphireTest
+class BatchedWriterTest extends SapphireTest
 {
     /**
      * @var bool
@@ -168,21 +171,21 @@ class BatchedWriterTest extends \SapphireTest
             $writer->writeToStage($pages, 'Stage');
             $writer->finish();
 
-            $currentStage = \Versioned::current_stage();
+            $currentStage = Versioned::current_stage();
 
-            \Versioned::reading_stage('Stage');
+            Versioned::reading_stage('Stage');
             $this->assertEquals(100, DogPage::get()->Count());
 
-            \Versioned::reading_stage('Live');
+            Versioned::reading_stage('Live');
             $this->assertEquals(0, DogPage::get()->Count());
 
             $writer->writeToStage($pages, 'Live');
             $writer->finish();
 
-            \Versioned::reading_stage('Live');
+            Versioned::reading_stage('Live');
             $this->assertEquals(100, DogPage::get()->Count());
 
-            \Versioned::reading_stage($currentStage);
+            Versioned::reading_stage($currentStage);
 
             $writer->deleteFromStage($pages, 'Stage', 'Live');
             $writer->finish();

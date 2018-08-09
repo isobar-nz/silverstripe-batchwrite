@@ -2,6 +2,9 @@
 
 namespace BatchWrite\Tests;
 
+use SilverStripe\Dev\SapphireTest;
+use SilverStripe\ORM\ValidationException;
+
 /**
  * Class WriteCallbackTest
  * @package BatchWrite\Tests
@@ -10,7 +13,7 @@ namespace BatchWrite\Tests;
  * Class WriteCallbackTest
  * @package BatchWrite\Tests
  */
-class WriteCallbackTest extends \SapphireTest
+class WriteCallbackTest extends SapphireTest
 {
     /**
      * @var bool
@@ -40,7 +43,7 @@ class WriteCallbackTest extends \SapphireTest
     }
 
     /**
-     * @throws \ValidationException
+     * @throws ValidationException
      * @throws null
      */
     public function testCallback_SetOnAfterWriteCallback_CallbackCalled()
@@ -66,7 +69,7 @@ class WriteCallbackTest extends \SapphireTest
     }
 
     /**
-     * @throws \ValidationException
+     * @throws ValidationException
      * @throws null
      */
     public function testCallback_SetOnBeforeWriteCallback_CallbackCalled()
@@ -92,7 +95,7 @@ class WriteCallbackTest extends \SapphireTest
     }
 
     /**
-     * @throws \ValidationException
+     * @throws ValidationException
      * @throws null
      */
     public function testCallback_SetOnAfterExistsCallback_CallbackCalled()

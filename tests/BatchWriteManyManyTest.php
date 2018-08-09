@@ -2,6 +2,8 @@
 
 namespace BatchWrite\Tests;
 
+use SilverStripe\Dev\SapphireTest;
+
 /**
  * Class BatchWriteManyManyTest
  * @package BatchWrite\Tests
@@ -10,7 +12,7 @@ namespace BatchWrite\Tests;
  * Class BatchWriteManyManyTest
  * @package BatchWrite\Tests
  */
-class BatchWriteManyManyTest extends \SapphireTest
+class BatchWriteManyManyTest extends SapphireTest
 {
     /**
      * @var bool

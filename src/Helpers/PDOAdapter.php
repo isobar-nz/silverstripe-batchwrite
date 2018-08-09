@@ -2,8 +2,11 @@
 
 namespace BatchWrite;
 
-use DataObject;
 use PDO;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBDecimal;
+use SilverStripe\ORM\FieldType\DBFloat;
+use SilverStripe\ORM\FieldType\DBInt;
 
 /**
  * Class PDOAdapter
@@ -71,9 +74,9 @@ class PDOAdapter implements DBAdapter
                 // need to fill in null values with appropriate values
                 // TODO is there a better way to figure out if a value needs to be filled in?
                 if ($value === null) {
-                    if ($fieldObjects[$field] instanceof \Int ||
-                        $fieldObjects[$field] instanceof \Decimal ||
-                        $fieldObjects[$field] instanceof \Float) {
+                    if ($fieldObjects[$field] instanceof DBInt ||
+                        $fieldObjects[$field] instanceof DBDecimal ||
+                        $fieldObjects[$field] instanceof DBFloat) {
                         $value = 0;
                     } else {
                         $value = '';

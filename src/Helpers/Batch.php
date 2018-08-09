@@ -1,6 +1,13 @@
 <?php
+
 use BatchWrite\MySQLiAdapter;
 use BatchWrite\PDOAdapter;
+use SilverStripe\ORM\Connect\MySQLDatabase;
+use SilverStripe\ORM\Connect\MySQLiConnector;
+use SilverStripe\ORM\Connect\PDOConnector;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\DB;
+use SilverStripe\ORM\FieldType\DBField;
 
 /**
  * Class Batch
@@ -30,7 +37,7 @@ class Batch
     {
         $this->adapter = $this->getAdapter();
         if(!isset(self::$autoIncrementIncrement)){
-            $result = \DB::query('SELECT @@auto_increment_increment as increment');
+            $result = DB::query('SELECT @@auto_increment_increment as increment');
             $row = $result->first();
             self::$autoIncrementIncrement = intval($row['increment']);
         }
@@ -344,7 +351,7 @@ class Batch
 
         $field = DBField::create_field('Int', null, 'ID');
         $ids = '(' . implode(', ', array_map(function ($id) use ($field) {
-                $id = $id instanceof \DataObject ? $id->ID : $id;
+                $id = $id instanceof DataObject ? $id->ID : $id;
                 return $field->prepValueForDB($id);
             }, $ids)) . ')';
 
