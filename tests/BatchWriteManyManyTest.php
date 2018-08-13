@@ -25,7 +25,7 @@ class BatchWriteManyManyTest extends BaseTest
         $children = [];
         for ($i = 0; $i < 5; $i++) {
             $child = Child::create();
-            $child->Name = "Soldier #{$i}";
+            $child->Name = $this->faker->name;
             $children[] = $child;
         }
 

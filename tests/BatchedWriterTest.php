@@ -33,13 +33,13 @@ class BatchedWriterTest extends BaseTest
 
             for ($i = 0; $i < 100; $i++) {
                 $owner = Human::create();
-                $owner->Name = "Human {$i}";
+                $owner->Name = $this->faker->name;
 
                 $dog = Dog::create();
-                $dog->Name = "Dog {$i}";
+                $dog->Name = $this->faker->firstName;
 
                 $cat = Cat::create();
-                $cat->Name = "Cat {$i}";
+                $cat->Name = $this->faker->firstName;
 
                 $owner->onAfterExistsCallback(function (Human $owner) use ($dog, $writer) {
                     $dog->OwnerID = $owner->ID;
@@ -99,12 +99,12 @@ class BatchedWriterTest extends BaseTest
     public function testWriteManyMany_SetChildrenForParent_RelationWritten()
     {
         $parent = Human::create();
-        $parent->Name = 'Bob';
+        $parent->Name = $this->faker->name;
 
         $children = [];
         for ($i = 0; $i < 5; $i++) {
             $child = Child::create();
-            $child->Name = "Soldier #{$i}";
+            $child->Name = $this->faker->name;
             $children[] = $child;
         }
 

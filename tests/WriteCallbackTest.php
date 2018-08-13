@@ -19,10 +19,10 @@ class WriteCallbackTest extends BaseTest
     public function testCallback_SetOnAfterWriteCallback_CallbackCalled()
     {
         $dog = Dog::create();
-        $dog->Name = 'Jim bob';
+        $dog->Name = $this->faker->firstName;
 
         $owner = Human::create();
-        $owner->Name = 'Hilly Stewart';
+        $owner->Name = $this->faker->name;
 
         $owner->onAfterWriteCallback(function ($owner) use ($dog) {
             $dog->OwnerID = $owner->ID;
@@ -45,10 +45,10 @@ class WriteCallbackTest extends BaseTest
     public function testCallback_SetOnBeforeWriteCallback_CallbackCalled()
     {
         $dog = Dog::create();
-        $dog->Name = 'Jim bob';
+        $dog->Name = $this->faker->firstName;
 
         $owner = Human::create();
-        $owner->Name = 'Hilly Stewart';
+        $owner->Name = $this->faker->name;
         $owner->write();
 
         $dog->onBeforeWriteCallback(function ($dog) use ($owner) {
@@ -71,13 +71,13 @@ class WriteCallbackTest extends BaseTest
     public function testCallback_SetOnAfterExistsCallback_CallbackCalled()
     {
         $dog1 = Dog::create();
-        $dog1->Name = 'Jim bob';
+        $dog1->Name = $this->faker->firstName;
 
         $dog2 = Dog::create();
-        $dog2->Name = 'Super Dog';
+        $dog2->Name = $this->faker->firstName;
 
         $owner = Human::create();
-        $owner->Name = 'Hilly Stewart';
+        $owner->Name = $this->faker->name;
         $owner->write();
 
         $owner->onAfterExistsCallback(function ($owner) use ($dog1) {

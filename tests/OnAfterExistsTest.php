@@ -99,12 +99,12 @@ class OnAfterExistsTest extends BaseTest
     public function testOnAfterExists_ArrayCondition_CalledBack()
     {
         $parent = Human::create();
-        $parent->Name = 'Bob';
+        $parent->Name = $this->faker->name;
 
         $children = [];
         for ($i = 0; $i < 5; $i++) {
             $child = Child::create();
-            $child->Name = "Soldier #{$i}";
+            $child->Name = $this->faker->name;
             $children[] = $child;
         }
 

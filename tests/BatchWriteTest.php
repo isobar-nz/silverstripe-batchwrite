@@ -22,8 +22,8 @@ class BatchWriteTest extends BaseTest
     public function testBatchWrite_WriteObject_ObjectExists()
     {
         $animal = Animal::create();
-        $animal->Name = 'Bob';
-        $animal->Country = 'Africa';
+        $animal->Name = $this->faker->firstName;
+        $animal->Country = $this->faker->country;
 
         $batch = Batch::create();
         $batch->write([$animal]);
@@ -42,8 +42,8 @@ class BatchWriteTest extends BaseTest
 
         for ($i = 0; $i < 100; $i++) {
             $animal = Animal::create();
-            $animal->Name = "Bob {$i}";
-            $animal->Country = "Africa {$i}";
+            $animal->Name = $this->faker->firstName;
+            $animal->Country = $this->faker->country;
             $animals[] = $animal;
         }
 
@@ -68,8 +68,8 @@ class BatchWriteTest extends BaseTest
         for ($i = 0; $i < 100; $i++) {
             $dog = Dog::create();
             $dog->Name = "Bob {$i}";
-            $dog->Country = "Africa {$i}";
-            $dog->Type = "Woof Dog {$i}";
+            $dog->Country = $this->faker->country;
+            $dog->Type = $this->faker->lastName;
             $dog->Color = "Brown #{$i}";
             $dogs[] = $dog;
         }
@@ -97,8 +97,8 @@ class BatchWriteTest extends BaseTest
     public function testBatchWrite_OnBeforeOnAfterCalled_ReturnsTrue()
     {
         $cat = Cat::create();
-        $cat->Name = 'Garfield';
-        $cat->Country = 'Canada';
+        $cat->Name = $this->faker->firstName;
+        $cat->Country = $this->faker->country;
         $cat->HasClaws = true;
 
         $batch = Batch::create();
@@ -118,9 +118,9 @@ class BatchWriteTest extends BaseTest
     public function testBatchWrite_ObjectExists_UpdatesObject()
     {
         $dog = Dog::create();
-        $dog->Name = 'Harry';
+        $dog->Name = $this->faker->firstName;
         $dog->Type = 'Trotter';
-        $dog->Color = 'Red';
+        $dog->Color = $this->faker->colorName;
         $dog->write();
         $dog->Name = 'Jimmy';
         $dog->Color = 'Brown';
@@ -174,7 +174,7 @@ class BatchWriteTest extends BaseTest
         $page->Author = 'Mrs Tu tu';
 
         $batch = Batch::create();
-        $batch->writeToStage([$page], 'Live');
+        $batch->writeToStage([$page], Versioned::LIVE);
         $this->assertEquals(1, $page->ID);
 
         Versioned::withVersionedMode(function () {
