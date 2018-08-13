@@ -8,6 +8,7 @@ use LittleGiant\BatchWrite\Adapters\MySQLiAdapter;
 use LittleGiant\BatchWrite\Adapters\PDOAdapter;
 use ReflectionMethod;
 use ReflectionProperty;
+use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\Connect\MySQLDatabase;
 use SilverStripe\ORM\Connect\MySQLiConnector;
@@ -304,23 +305,15 @@ class Batch
     {
         if (empty($ids)) return;
 
-        $singleton = singleton($className);
         $dataObjectSchema = DataObject::getSchema();
-        $ancestry = array_reverse(array_filter($singleton->getClassAncestry(), function ($class) use ($dataObjectSchema) {
-            return $dataObjectSchema->classHasTable($class);
-        }));
-
-        $field = DBInt::create('ID');
-        $ids = '(' . implode(', ', array_map(function ($id) use ($field) {
-                $id = $id instanceof DataObject ? $id->ID : $id;
-                return $field->prepValueForDB($id);
-            }, $ids)) . ')';
-
+        $ancestry = ClassInfo::ancestry($className, true);
         $postfix = empty($postfix) || $postfix === Versioned::DRAFT ? '' : "_{$postfix}";
+
+        $ids = '(' . implode(',', $ids) . ')';
+
         foreach ($ancestry as $class) {
-            $table = $dataObjectSchema->baseDataTable($class) . $postfix;
-            $sql = "DELETE FROM `{$table}` WHERE ID IN {$ids}";
-            DB::query($sql);
+            $table = $dataObjectSchema->tableName($class) . $postfix;
+            DB::query("DELETE FROM \"{$table}\" WHERE \"ID\" IN {$ids}");
         }
     }
 
