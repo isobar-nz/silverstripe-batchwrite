@@ -47,7 +47,7 @@ class OnAfterExists
     }
 
     /**
-     * @param $objects
+     * @param iterable|DataObject[] $objects
      * @param callable $callback
      */
     public function addCondition($objects, callable $callback = null)

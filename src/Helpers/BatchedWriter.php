@@ -61,6 +61,11 @@ class BatchedWriter
     private $dataObjectRecordProperty;
 
     /**
+     * @var Batch
+     */
+    private $batch;
+
+    /**
      * @param int $batchSize
      */
     public function __construct($batchSize = 100)
@@ -73,7 +78,7 @@ class BatchedWriter
     }
 
     /**
-     * @param $dataObjects
+     * @param iterable|DataObject[] $dataObjects
      */
     public function write($dataObjects)
     {
@@ -117,12 +122,11 @@ class BatchedWriter
     }
 
     /**
-     * @param $dataObjects
-     * @param $key
+     * @param iterable|DataObject[] $dataObjects
+     * @param string[] $stages
      */
-    public function writeToStage($dataObjects, $key)
+    public function writeToStage($dataObjects, ...$stages)
     {
-        $stages = array_slice(func_get_args(), 1);
         $key = serialize($stages);
 
         if ($dataObjects instanceof DataObject) {
@@ -176,8 +180,8 @@ class BatchedWriter
 
     /**
      * @param DataObject $object
-     * @param $relation
-     * @param $belongs
+     * @param string $relation
+     * @param iterable|DataObject[] $belongs
      */
     public function writeManyMany($object, $relation, $belongs)
     {
@@ -198,7 +202,7 @@ class BatchedWriter
     }
 
     /**
-     * @param DataObject[] $objects
+     * @param iterable|DataObject[] $objects
      */
     public function delete($objects)
     {
@@ -216,8 +220,8 @@ class BatchedWriter
     }
 
     /**
-     * @param $className
-     * @param $ids
+     * @param string $className
+     * @param iterable|int[] $ids
      */
     public function deleteIDs($className, $ids)
     {
@@ -238,13 +242,11 @@ class BatchedWriter
     }
 
     /**
-     * @param DataObject[] $objects
-     * @param $stage
+     * @param iterable|DataObject[] $objects
+     * @param string[] $stages
      */
-    public function deleteFromStage($objects, $stage)
+    public function deleteFromStage($objects, ...$stages)
     {
-        $stages = array_slice(func_get_args(), 1);
-
         foreach ($stages as $stage) {
             foreach ($objects as $object) {
                 $className = $object->ClassName;
@@ -266,14 +268,12 @@ class BatchedWriter
     }
 
     /**
-     * @param $className
-     * @param $ids
-     * @param $stage
+     * @param string $className
+     * @param iterable|int[] $ids
+     * @param string[] $stages
      */
-    public function deleteIDsFromStage($className, $ids, $stage)
+    public function deleteIDsFromStage($className, $ids, ...$stages)
     {
-        $stages = array_slice(func_get_args(), 2);
-
         if (!is_array($ids)) {
             $ids = array($ids);
         }
