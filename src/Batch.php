@@ -13,10 +13,8 @@ use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\Connect\MySQLDatabase;
 use SilverStripe\ORM\Connect\MySQLiConnector;
 use SilverStripe\ORM\Connect\PDOConnector;
-use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
-use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\Versioned\Versioned;
 
 /**
@@ -26,6 +24,9 @@ use SilverStripe\Versioned\Versioned;
 class Batch
 {
     use Injectable;
+
+    const ACTION_UPDATE = 0;
+    const ACTION_INSERT = 1;
 
     /**
      * @var int @@auto_increment_increment for the MySQL server
@@ -117,53 +118,43 @@ class Batch
     /**
      * @param iterable|DataObject[] $dataObjects
      * @param string $postfix
-     * @return mixed
+     * @return iterable|DataObject[] mixed
      */
     private function writeTablePostfix($dataObjects, $postfix = '')
     {
         $types = [];
+        $now = date('Y-m-d H:i:s');
 
-        $date = date('Y-m-d H:i:s');
         foreach ($dataObjects as $dataObject) {
-            $action = 'insert';
-            if ($dataObject->getField('ID')) {
-                $action = 'update';
-            }
+            $action = $dataObject->isInDB() ? static::ACTION_UPDATE : static::ACTION_INSERT;
 
-            if (!$dataObject->getField('Created')) {
-                $dataObject->setField('Created', $date);
+            if (!$dataObject->Created) {
+                $dataObject->Created = $now;
             }
-            $dataObject->setField('LastEdited', $date);
+            $dataObject->LastEdited = $now;
 
             $types[$dataObject->ClassName][$action][] = $dataObject;
         }
 
         foreach ($types as $className => $actions) {
-            $classSingleton = singleton($className);
-            $ancestry = array_filter($classSingleton->getClassAncestry(), function ($class) {
-                return DataObject::getSchema()->classHasTable($class);
-            });
+            $ancestry = ClassInfo::ancestry($className, true);
             $rootClass = array_shift($ancestry);
 
             foreach ($actions as $action => $objects) {
                 /** @var DataObject[] $objects */
-                $this->adapter->insertClass($rootClass, $objects, false, $action === 'update', $postfix);
+                $this->adapter->insertClass($rootClass, $objects, false, $action === static::ACTION_UPDATE, $postfix);
 
-                if ($action === 'insert') {
-                    $sql = 'SELECT LAST_INSERT_ID() AS ID, ROW_COUNT() AS Count';
+                if ($action === static::ACTION_INSERT) {
+                    $id = intval(DB::query('SELECT LAST_INSERT_ID() AS ID')->value());
 
-                    $row = DB::query($sql)->first();
-
-                    // check count?
-                    $id = intval($row['ID']);
                     foreach ($objects as $obj) {
-                        $obj->setField('ID', $id);
+                        $obj->ID = $id;
                         $id += self::$autoIncrementIncrement;
                     }
                 }
 
                 foreach ($ancestry as $class) {
-                    $this->adapter->insertClass($class, $objects, true, $action === 'update', $postfix);
+                    $this->adapter->insertClass($class, $objects, true, $action === static::ACTION_UPDATE, $postfix);
                 }
 
                 $objects[0]->flushCache();
@@ -255,10 +246,10 @@ class Batch
 
     /**
      * @param DataObject $parent
-     * @param $relation
-     * @return array
+     * @param string $relation
+     * @return string[]
      */
-    private function getRelationFields($parent, $relation)
+    protected function getRelationFields($parent, $relation)
     {
         if (isset($this->relations[$parent->ClassName][$relation])) {
             return $this->relations[$parent->ClassName][$relation];
@@ -268,7 +259,7 @@ class Batch
         $manyMany = $dataObjectSchema->manyManyComponent($parent, $relation);
 
         if ($manyMany === null) {
-            throw new RuntimeException(); // TODO
+            throw new \RuntimeException(); // TODO
         }
 
         $relationFields = [$manyMany['join'], $manyMany['parentField'], $manyMany['childField']];
@@ -277,14 +268,14 @@ class Batch
     }
 
     /**
-     * @param DataList|DataObject[] $dataObjects
+     * @param iterable|DataObject[] $dataObjects
      */
     public function delete($dataObjects)
     {
         $types = [];
 
         foreach ($dataObjects as $dataObject) {
-            $types[$dataObject->ClassName][] = $dataObject->getField('ID');
+            $types[$dataObject->ClassName][] = $dataObject->ID;
         }
 
         foreach ($types as $className => $ids) {
@@ -297,7 +288,7 @@ class Batch
      * @param iterable|int[] $ids
      * @param string $stage
      */
-    private function deleteTablePostfix($className, $ids, $stage = '')
+    protected function deleteTablePostfix($className, $ids, $stage = '')
     {
         if (empty($ids)) return;
 
@@ -341,7 +332,7 @@ class Batch
         $types = [];
 
         foreach ($dataObjects as $dataObject) {
-            $types[$dataObject->ClassName][] = $dataObject->getField('ID');
+            $types[$dataObject->ClassName][] = $dataObject->ID;
         }
 
         foreach ($types as $className => $ids) {
