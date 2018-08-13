@@ -2,6 +2,7 @@
 
 namespace LittleGiant\BatchWrite\Adapters;
 
+use LittleGiant\BatchWrite\Batch;
 use PDO;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
@@ -71,8 +72,7 @@ class PDOAdapter implements DBAdapter
         }
 
         $fields = array_keys($fields);
-        // ClassName or ClassName_Live
-        $tablePostfix = empty($tablePostfix) ? '' : "_{$tablePostfix}";
+        $tablePostfix = Batch::getStageTableSuffix($tablePostfix);
         $tableName = $dataObjectSchema->tableName($className) . $tablePostfix;
 
         //  (`Field1`, `Field2`, ...)

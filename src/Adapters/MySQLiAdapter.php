@@ -3,6 +3,7 @@
 namespace LittleGiant\BatchWrite\Adapters;
 
 use Exception;
+use LittleGiant\BatchWrite\Batch;
 use mysqli;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
@@ -95,7 +96,7 @@ class MySQLiAdapter implements DBAdapter
         }
         array_unshift($params, $typeString);
 
-        $tablePostfix = empty($tablePostfix) ? '' : "_{$tablePostfix}";
+        $tablePostfix = Batch::getStageTableSuffix($tablePostfix);
         $table = $dataObjectSchema->tableName($className) . $tablePostfix;
         $columns = '`' . implode('`,`', $fields) . '`';
 

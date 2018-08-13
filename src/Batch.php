@@ -121,10 +121,6 @@ class Batch
      */
     private function writeTablePostfix($dataObjects, $postfix = '')
     {
-        if ($postfix === Versioned::DRAFT) {
-            $postfix = '';
-        }
-
         $types = [];
 
         $date = date('Y-m-d H:i:s');
@@ -299,22 +295,32 @@ class Batch
     /**
      * @param string $className
      * @param iterable|int[] $ids
-     * @param string $postfix
+     * @param string $stage
      */
-    private function deleteTablePostfix($className, $ids, $postfix = '')
+    private function deleteTablePostfix($className, $ids, $stage = '')
     {
         if (empty($ids)) return;
 
         $dataObjectSchema = DataObject::getSchema();
         $ancestry = ClassInfo::ancestry($className, true);
-        $postfix = empty($postfix) || $postfix === Versioned::DRAFT ? '' : "_{$postfix}";
 
+        $stage = static::getStageTableSuffix($stage);
         $ids = '(' . implode(',', $ids) . ')';
 
         foreach ($ancestry as $class) {
-            $table = $dataObjectSchema->tableName($class) . $postfix;
+            $table = $dataObjectSchema->tableName($class) . $stage;
             DB::query("DELETE FROM \"{$table}\" WHERE \"ID\" IN {$ids}");
         }
+    }
+
+    /**
+     * @param string $stage
+     * @return string
+     */
+    public static function getStageTableSuffix($stage)
+    {
+        if (empty($stage) || $stage === Versioned::DRAFT) return '';
+        return strpos($stage, '_') === false ? "_{$stage}" : $stage;
     }
 
     /**
