@@ -6,7 +6,6 @@ use Exception;
 use LittleGiant\BatchWrite\Adapters\DBAdapter;
 use LittleGiant\BatchWrite\Adapters\MySQLiAdapter;
 use LittleGiant\BatchWrite\Adapters\PDOAdapter;
-use LittleGiant\BatchWrite\Helpers\RuntimeException;
 use ReflectionMethod;
 use ReflectionProperty;
 use SilverStripe\Core\Injector\Injectable;
@@ -93,18 +92,25 @@ class Batch
         if (empty($dataObjects)) return;
 
         foreach ($dataObjects as $dataObject) {
-            $onBeforeWriteMethod = new ReflectionMethod($dataObject, 'onBeforeWrite');
-            $onBeforeWriteMethod->setAccessible(true);
-            $onBeforeWriteMethod->invoke($dataObject);
+            $this->onBeforeWrite($dataObject);
         }
 
         $this->writeTablePostfix($dataObjects);
 
         foreach ($dataObjects as $dataObject) {
-            $onBeforeWriteMethod = new ReflectionMethod($dataObject, 'onAfterWrite');
-            $onBeforeWriteMethod->setAccessible(true);
-            $onBeforeWriteMethod->invoke($dataObject);
+            $this->onAfterWrite($dataObject);
         }
+    }
+
+    /**
+     * @param DataObject $object
+     * @return mixed
+     */
+    protected function onBeforeWrite(DataObject $object)
+    {
+        $onBeforeWriteMethod = new ReflectionMethod($object, 'onBeforeWrite');
+        $onBeforeWriteMethod->setAccessible(true);
+        return $onBeforeWriteMethod->invoke($object);
     }
 
     /**
@@ -171,6 +177,17 @@ class Batch
     }
 
     /**
+     * @param DataObject $object
+     * @return mixed
+     */
+    protected function onAfterWrite(DataObject $object)
+    {
+        $onAfterWriteMethod = new ReflectionMethod($object, 'onAfterWrite');
+        $onAfterWriteMethod->setAccessible(true);
+        return $onAfterWriteMethod->invoke($object);
+    }
+
+    /**
      * @param iterable|DataObject[] $dataObjects
      * @param string[] $stages
      */
@@ -179,7 +196,7 @@ class Batch
         if (empty($dataObjects)) return;
 
         foreach ($dataObjects as $dataObject) {
-            $dataObject->onBeforeWrite();
+            $this->onBeforeWrite($dataObject);
         }
 
         foreach ($stages as $stage) {
@@ -187,7 +204,7 @@ class Batch
         }
 
         foreach ($dataObjects as $dataObject) {
-            $dataObject->onAfterWrite();
+            $this->onAfterWrite($dataObject);
         }
     }
 
