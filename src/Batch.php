@@ -207,38 +207,28 @@ class Batch
         $types = [];
 
         foreach ($sets as $set) {
-            $types[$set[0]->ClassName][$set[2]->ClassName][] = $set;
+            $types[$set[0]->ClassName][$set[1]][] = $set;
         }
 
-        foreach ($types as $className => $belongs) {
-            foreach ($belongs as $sets) {
+        foreach ($types as $className => $relations) {
+            foreach ($relations as $relationName => $sets) {
                 if (empty($sets)) continue;
 
-                $relationFields = $this->getRelationFields($sets[0][0], $sets[0][1]);
-
-                $tableName = $relationFields[0];
-                $columns = [$relationFields[1], $relationFields[2]];
-
+                $relationFields = $this->getRelationFields($sets[0][0], $relationName);
 //                $extraFields = $object->many_many_ExtraFields($relation);
 
-                $inserts = [];
-                $insert = '(?,?)';
                 $params = [];
                 foreach ($sets as $set) {
-                    $params[] = intval($set[0]->getField('ID'));
-                    $params[] = intval($set[2]->getField('ID'));
-                    $inserts[] = $insert;
+                    $params[] = intval($set[0]->ID);
+                    $params[] = intval($set[2]->ID);
                     // todo extra fields
                 }
 
-                $columns = implode(',', array_map(function ($name) {
-                    return "`{$name}`";
-                }, $columns));
+                $tableName = $relationFields[0];
+                $columns = "\"{$relationFields[1]}\", \"{$relationFields[2]}\"";
+                $inserts = rtrim(str_repeat('(?,?),', count($sets)), ',');
 
-                $inserts = implode(',', $inserts);
-
-                $sql = "INSERT INTO `{$tableName}` ({$columns}) VALUES {$inserts}";
-
+                $sql = "INSERT INTO \"{$tableName}\" ({$columns}) VALUES {$inserts}";
                 $this->adapter->insertManyMany($sql, $params);
             }
         }
