@@ -30,7 +30,7 @@ class BatchWriteTest extends BaseTest
 
         $this->assertTrue($animal->exists());
         $this->assertEquals(1, $animal->ID);
-        $this->assertEquals(1, Animal::get()->count());
+        $this->assertCount(1, Animal::get());
     }
 
     /**
@@ -55,7 +55,7 @@ class BatchWriteTest extends BaseTest
             $this->assertEquals($i + 1, $id);
         }
 
-        $this->assertEquals(100, Animal::get()->count());
+        $this->assertCount(100, Animal::get());
     }
 
     /**
@@ -83,7 +83,7 @@ class BatchWriteTest extends BaseTest
             $this->assertEquals($i + 1, $id);
         }
 
-        $this->assertEquals(100, Dog::get()->count());
+        $this->assertCount(100, Dog::get());
 
         foreach (Animal::get() as $i => $dog) {
             $this->assertEquals("Bob {$i}", $dog->Name);
@@ -108,7 +108,7 @@ class BatchWriteTest extends BaseTest
         $this->assertEquals(1, $cat->ID);
         $this->assertTrue($cat->getOnBeforeWriteCalled());
         $this->assertTrue($cat->getOnAfterWriteCalled());
-        $this->assertEquals(1, Cat::get()->count());
+        $this->assertCount(1, Cat::get());
     }
 
     /**

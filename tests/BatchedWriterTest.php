@@ -69,9 +69,9 @@ class BatchedWriterTest extends BaseTest
             $dogs = Dog::get();
             $cats = Cat::get();
 
-            $this->assertEquals(100, $owners->Count());
-            $this->assertEquals(100, $dogs->Count());
-            $this->assertEquals(100, $cats->Count());
+            $this->assertCount(100, $owners);
+            $this->assertCount(100, $dogs);
+            $this->assertCount(100, $cats);
 
             for ($i = 0; $i < 100; $i++) {
                 $owner = $owners[$i];
@@ -87,9 +87,9 @@ class BatchedWriterTest extends BaseTest
             $writer->delete($cats);
             $writer->finish();
 
-            $this->assertEquals(0, Human::get()->Count());
-            $this->assertEquals(0, Dog::get()->Count());
-            $this->assertEquals(0, Cat::get()->Count());
+            $this->assertCount(0, Human::get());
+            $this->assertCount(0, Dog::get());
+            $this->assertCount(0, Cat::get());
         }
     }
 
@@ -123,7 +123,7 @@ class BatchedWriterTest extends BaseTest
 
         /** @var Human $parent */
         $parent = Human::get()->first();
-        $this->assertEquals(5, $parent->Children()->Count());
+        $this->assertCount(5, $parent->Children());
     }
 
     /**
@@ -148,23 +148,23 @@ class BatchedWriterTest extends BaseTest
 
             Versioned::withVersionedMode(function () {
                 Versioned::set_stage(Versioned::DRAFT);
-                $this->assertEquals(100, DogPage::get()->Count());
+                $this->assertCount(100, DogPage::get());
             });
 
             Versioned::withVersionedMode(function () use ($writer, $pages) {
                 Versioned::set_stage(Versioned::LIVE);
-                $this->assertEquals(0, DogPage::get()->Count());
+                $this->assertCount(0, DogPage::get());
 
                 $writer->writeToStage($pages, Versioned::LIVE);
                 $writer->finish();
 
-                $this->assertEquals(100, DogPage::get()->Count());
+                $this->assertCount(100, DogPage::get());
             });
 
             $writer->deleteFromStage($pages, Versioned::DRAFT, Versioned::LIVE);
             $writer->finish();
 
-            $this->assertEquals(0, DogPage::get()->Count());
+            $this->assertCount(0, DogPage::get());
         }
     }
 }

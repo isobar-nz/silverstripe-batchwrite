@@ -33,8 +33,8 @@ class WriteCallbackTest extends BaseTest
 
         $this->assertTrue($owner->exists());
         $this->assertTrue($dog->exists());
-        $this->assertEquals(1, Human::get()->Count());
-        $this->assertEquals(1, Dog::get()->Count());
+        $this->assertCount(1, Human::get());
+        $this->assertCount(1, Dog::get());
         $this->assertEquals($owner->ID, $dog->OwnerID);
     }
 
@@ -59,8 +59,8 @@ class WriteCallbackTest extends BaseTest
 
         $this->assertTrue($owner->exists());
         $this->assertTrue($dog->exists());
-        $this->assertEquals(1, Human::get()->Count());
-        $this->assertEquals(1, Dog::get()->Count());
+        $this->assertCount(1, Human::get());
+        $this->assertCount(1, Dog::get());
         $this->assertEquals($owner->ID, $dog->OwnerID);
     }
 
@@ -95,8 +95,8 @@ class WriteCallbackTest extends BaseTest
         $this->assertTrue($owner->exists());
         $this->assertTrue($dog1->exists());
         $this->assertTrue($dog2->exists());
-        $this->assertEquals(1, Human::get()->Count());
-        $this->assertEquals(2, Dog::get()->Count());
+        $this->assertCount(1, Human::get());
+        $this->assertCount(2, Dog::get());
         $this->assertEquals($owner->ID, $dog1->OwnerID);
         $this->assertEquals($owner->ID, $dog2->OwnerID);
     }

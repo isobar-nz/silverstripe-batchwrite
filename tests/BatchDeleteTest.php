@@ -40,8 +40,8 @@ class BatchDeleteTest extends BaseTest
         $batch = Batch::create();
         $batch->delete($objects);
 
-        $this->assertEquals(0, Dog::get()->Count());
-        $this->assertEquals(0, Human::get()->Count());
+        $this->assertCount(0, Dog::get());
+        $this->assertCount(0, Human::get());
     }
 
     /**
@@ -62,7 +62,7 @@ class BatchDeleteTest extends BaseTest
         $batch = Batch::create();
         $batch->deleteIDs(Dog::class, $ids);
 
-        $this->assertEquals(0, Dog::get()->Count());
+        $this->assertCount(0, Dog::get());
     }
 
     /**
@@ -83,16 +83,16 @@ class BatchDeleteTest extends BaseTest
 
         Versioned::withVersionedMode(function () use ($batch, $pages) {
             Versioned::set_stage(Versioned::LIVE);
-            $this->assertEquals(100, DogPage::get()->Count());
+            $this->assertCount(100, DogPage::get());
             $batch->deleteFromStage($pages, Versioned::LIVE);
-            $this->assertEquals(0, DogPage::get()->Count());
+            $this->assertCount(0, DogPage::get());
         });
 
         Versioned::withVersionedMode(function () use ($batch, $pages) {
             Versioned::set_stage(Versioned::DRAFT);
-            $this->assertEquals(100, DogPage::get()->Count());
+            $this->assertCount(100, DogPage::get());
             $batch->deleteFromStage($pages, Versioned::DRAFT);
-            $this->assertEquals(0, DogPage::get()->Count());
+            $this->assertCount(0, DogPage::get());
         });
     }
 }

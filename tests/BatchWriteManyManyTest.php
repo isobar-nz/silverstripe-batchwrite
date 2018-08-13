@@ -42,6 +42,6 @@ class BatchWriteManyManyTest extends BaseTest
 
         /** @var Human $parent */
         $parent = Human::get()->first();
-        $this->assertEquals(5, $parent->Children()->Count());
+        $this->assertCount(5, $parent->Children());
     }
 }
