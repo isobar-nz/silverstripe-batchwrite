@@ -22,13 +22,13 @@ class OnAfterExistsTest extends BaseTest
      */
     public function testCallback_OneCondition_CalledBack()
     {
-        $dog = new Dog();
+        $dog = Dog::create();
         $dog->Name = 'Johnny';
 
-        $owner = new Human();
+        $owner = Human::create();
         $owner->Name = 'Bob';
 
-        $afterExists = new OnAfterExists(function () use ($dog) {
+        $afterExists = OnAfterExists::create(function () use ($dog) {
             $dog->write();
         });
 
@@ -48,19 +48,19 @@ class OnAfterExistsTest extends BaseTest
      */
     public function testCallback_ManyConditions_CalledBack()
     {
-        $dog = new Dog();
+        $dog = Dog::create();
         $dog->Name = 'Johnny';
 
-        $owner1 = new Human();
+        $owner1 = Human::create();
         $owner1->Name = 'Bob';
 
-        $owner2 = new Human();
+        $owner2 = Human::create();
         $owner2->Name = 'Wot';
 
-        $cat = new Cat();
+        $cat = Cat::create();
         $cat->Name = 'Agnis';
 
-        $afterExists = new OnAfterExists(function () use ($dog) {
+        $afterExists = OnAfterExists::create(function () use ($dog) {
             $dog->write();
         });
 
@@ -98,19 +98,19 @@ class OnAfterExistsTest extends BaseTest
      */
     public function testOnAfterExists_ArrayCondition_CalledBack()
     {
-        $parent = new Human();
+        $parent = Human::create();
         $parent->Name = 'Bob';
 
         $children = [];
         for ($i = 0; $i < 5; $i++) {
-            $child = new Child();
             $child->Name = 'Soldier #' . $i;
+            $child = Child::create();
             $children[] = $child;
         }
 
-        $batch = new Batch();
+        $batch = Batch::create();
 
-        $afterExists = new OnAfterExists(function () use ($batch, $parent, $children) {
+        $afterExists = OnAfterExists::create(function () use ($batch, $parent, $children) {
             $sets = [];
             foreach ($children as $child) {
                 $sets[] = [$parent, 'Children', $child];

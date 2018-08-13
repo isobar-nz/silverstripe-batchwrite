@@ -4,11 +4,13 @@ namespace LittleGiant\BatchWrite\Helpers;
 
 use Exception;
 use http\Exception\RuntimeException;
+use LittleGiant\BatchWrite\Adapters\DBAdapter;
 use LittleGiant\BatchWrite\Adapters\MySQLiAdapter;
 use LittleGiant\BatchWrite\Adapters\PDOAdapter;
 use ReflectionMethod;
 use ReflectionProperty;
 use SilverStripe\Core\ClassInfo;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\Connect\MySQLDatabase;
 use SilverStripe\ORM\Connect\MySQLiConnector;
 use SilverStripe\ORM\Connect\PDOConnector;
@@ -24,6 +26,8 @@ use SilverStripe\Versioned\Versioned;
  */
 class Batch
 {
+    use Injectable;
+
     /**
      * @var array
      */
@@ -54,7 +58,7 @@ class Batch
     }
 
     /**
-     * @return MySQLiAdapter|PDOAdapter
+     * @return DBAdapter
      * @throws Exception
      */
     private function getAdapter()
@@ -65,12 +69,12 @@ class Batch
                 $connProperty = new ReflectionProperty(MySQLiConnector::class, 'dbConn');
                 $connProperty->setAccessible(true);
                 $conn = $connProperty->getValue($connector);
-                return new MySQLiAdapter($conn);
+                return MySQLiAdapter::create($conn);
             } else if ($connector instanceof PDOConnector) {
                 $connProperty = new ReflectionProperty(PDOConnector::class, 'pdoConnection');
                 $connProperty->setAccessible(true);
                 $conn = $connProperty->getValue($connector);
-                return new PDOAdapter($conn);
+                return PDOAdapter::create($conn);
             }
         } else {
             $db = DB::get_conn();
@@ -78,7 +82,7 @@ class Batch
                 $connProperty = new ReflectionProperty(MySQLDatabase::class, 'dbConn');
                 $connProperty->setAccessible(true);
                 $conn = $connProperty->getValue($db);
-                return new MySQLiAdapter($conn);
+                return MySQLiAdapter::create($conn);
             }
         }
 

@@ -3,6 +3,7 @@
 namespace LittleGiant\BatchWrite\Adapters;
 
 use PDO;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBDecimal;
 use SilverStripe\ORM\FieldType\DBFloat;
@@ -14,6 +15,8 @@ use SilverStripe\ORM\FieldType\DBInt;
  */
 class PDOAdapter implements DBAdapter
 {
+    use Injectable;
+
     /**
      * @var PDO
      */

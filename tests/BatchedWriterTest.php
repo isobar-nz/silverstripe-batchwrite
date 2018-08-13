@@ -29,17 +29,17 @@ class BatchedWriterTest extends BaseTest
             $dogs = [];
             $cats = [];
 
-            $writer = new BatchedWriter($size);
+            $writer = BatchedWriter::create($size);
 
             for ($i = 0; $i < 100; $i++) {
-                $owner = new Human();
                 $owner->Name = 'Human ' . $i;
+                $owner = Human::create();
 
-                $dog = new Dog();
                 $dog->Name = 'Dog ' . $i;
+                $dog = Dog::create();
 
-                $cat = new Cat();
                 $cat->Name = 'Cat ' . $i;
+                $cat = Cat::create();
 
                 $owner->onAfterExistsCallback(function (Human $owner) use ($dog, $writer) {
                     $dog->OwnerID = $owner->ID;
@@ -98,19 +98,19 @@ class BatchedWriterTest extends BaseTest
      */
     public function testWriteManyMany_SetChildrenForParent_RelationWritten()
     {
-        $parent = new Human();
+        $parent = Human::create();
         $parent->Name = 'Bob';
 
         $children = [];
         for ($i = 0; $i < 5; $i++) {
-            $child = new Child();
             $child->Name = 'Soldier #' . $i;
+            $child = Child::create();
             $children[] = $child;
         }
 
-        $writer = new BatchedWriter();
+        $writer = BatchedWriter::create();
 
-        $afterExists = new OnAfterExists(function () use ($writer, $parent, $children) {
+        $afterExists = OnAfterExists::create(function () use ($writer, $parent, $children) {
             $writer->writeManyMany($parent, 'Children', $children);
         });
 
@@ -134,12 +134,12 @@ class BatchedWriterTest extends BaseTest
         $sizes = [10, 30, 100, 300];
 
         foreach ($sizes as $size) {
-            $writer = new BatchedWriter($size);
+            $writer = BatchedWriter::create($size);
 
             $pages = [];
             for ($i = 0; $i < 100; $i++) {
-                $page = new DogPage();
                 $page->Title = 'Wonder Pup  ' . $i;
+                $page = DogPage::create();
                 $pages[] = $page;
             }
 

@@ -3,6 +3,7 @@
 namespace LittleGiant\BatchWrite\Helpers;
 
 use ReflectionProperty;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
 
 /**
@@ -10,6 +11,8 @@ use SilverStripe\ORM\DataObject;
  */
 class BatchedWriter
 {
+    use Injectable;
+
     /**
      * @var int
      */
@@ -70,7 +73,7 @@ class BatchedWriter
      */
     public function __construct($batchSize = 100)
     {
-        $this->batch = new Batch();
+        $this->batch = Batch::create();
         $this->batchSize = $batchSize;
 
         $this->dataObjectRecordProperty = new ReflectionProperty(DataObject::class, 'record');

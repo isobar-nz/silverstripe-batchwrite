@@ -21,11 +21,11 @@ class BatchWriteTest extends BaseTest
      */
     public function testBatchWrite_WriteObject_ObjectExists()
     {
-        $animal = new Animal();
+        $animal = Animal::create();
         $animal->Name = 'Bob';
         $animal->Country = 'Africa';
 
-        $batch = new Batch();
+        $batch = Batch::create();
         $batch->write([$animal]);
 
         $this->assertTrue($animal->exists());
@@ -41,13 +41,13 @@ class BatchWriteTest extends BaseTest
         $animals = [];
 
         for ($i = 0; $i < 100; $i++) {
-            $animal = new Animal();
             $animal->Name = 'Bob ' . $i;
             $animal->Country = 'Africa ' . $i;
+            $animal = Animal::create();
             $animals[] = $animal;
         }
 
-        $batch = new Batch();
+        $batch = Batch::create();
         $batch->write($animals);
 
         for ($i = 0; $i < 100; $i++) {
@@ -66,15 +66,15 @@ class BatchWriteTest extends BaseTest
         $dogs = [];
 
         for ($i = 0; $i < 100; $i++) {
-            $dog = new Dog();
             $dog->Name = 'Bob ' . $i;
             $dog->Country = 'Africa ' . $i;
             $dog->Type = 'Woof Dog ' . $i;
             $dog->Color = 'Brown #' . $i;
+            $dog = Dog::create();
             $dogs[] = $dog;
         }
 
-        $batch = new Batch();
+        $batch = Batch::create();
         $batch->write($dogs);
 
         for ($i = 0; $i < 100; $i++) {
@@ -96,12 +96,12 @@ class BatchWriteTest extends BaseTest
      */
     public function testBatchWrite_OnBeforeOnAfterCalled_ReturnsTrue()
     {
-        $cat = new Cat();
+        $cat = Cat::create();
         $cat->Name = 'Garfield';
         $cat->Country = 'Canada';
         $cat->HasClaws = true;
 
-        $batch = new Batch();
+        $batch = Batch::create();
         $batch->write([$cat]);
 
         $this->assertTrue($cat->exists());
@@ -117,7 +117,7 @@ class BatchWriteTest extends BaseTest
      */
     public function testBatchWrite_ObjectExists_UpdatesObject()
     {
-        $dog = new Dog();
+        $dog = Dog::create();
         $dog->Name = 'Harry';
         $dog->Type = 'Trotter';
         $dog->Color = 'Red';
@@ -125,7 +125,7 @@ class BatchWriteTest extends BaseTest
         $dog->Name = 'Jimmy';
         $dog->Color = 'Brown';
 
-        $batch = new Batch();
+        $batch = Batch::create();
         $batch->write([$dog]);
 
         /** @var Dog|null $dog */
@@ -140,11 +140,11 @@ class BatchWriteTest extends BaseTest
      */
     public function testBatchWrite_WriteObjectToStage_WritesStage()
     {
-        $page = new DogPage();
+        $page = DogPage::create();
         $page->Title = 'I Love Dogs';
         $page->Author = 'Mr Scruffy';
 
-        $batch = new Batch();
+        $batch = Batch::create();
         $batch->writeToStage([$page], Versioned::DRAFT);
         $this->assertEquals(1, $page->ID);
 
@@ -169,11 +169,11 @@ class BatchWriteTest extends BaseTest
      */
     public function testBatchWrite_WriteObjectToLive_WritesLive()
     {
-        $page = new DogPage();
+        $page = DogPage::create();
         $page->Title = 'I Hate Bones';
         $page->Author = 'Mrs Tu tu';
 
-        $batch = new Batch();
+        $batch = Batch::create();
         $batch->writeToStage([$page], 'Live');
         $this->assertEquals(1, $page->ID);
 
@@ -198,11 +198,11 @@ class BatchWriteTest extends BaseTest
      */
     public function testBatchWrite_WriteObjectToStageAndLive_WritesStageAndLive()
     {
-        $page = new DogPage();
+        $page = DogPage::create();
         $page->Title = 'WOOF';
         $page->Author = 'Woof Woof';
 
-        $batch = new Batch();
+        $batch = Batch::create();
         $batch->writeToStage([$page], Versioned::DRAFT, Versioned::LIVE);
         $this->assertEquals(1, $page->ID);
 
@@ -230,15 +230,15 @@ class BatchWriteTest extends BaseTest
      */
     public function testBatchWrite_DifferentClasses_WritesObjects()
     {
-        $dog = new Dog();
+        $dog = Dog::create();
         $dog->Name = 'Snuffins';
         $dog->Color = 'Red';
 
-        $cat = new Cat();
+        $cat = Cat::create();
         $cat->Name = 'Puff daddy';
         $cat->HasClaws = true;
 
-        $batch = new Batch();
+        $batch = Batch::create();
         $batch->write([$dog, $cat]);
 
         $this->assertTrue($dog->exists());

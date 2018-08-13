@@ -4,6 +4,7 @@ namespace LittleGiant\BatchWrite\Adapters;
 
 use Exception;
 use mysqli;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\FieldType\DBBoolean;
 use SilverStripe\ORM\FieldType\DBDecimal;
@@ -17,6 +18,8 @@ use SilverStripe\ORM\FieldType\DBMoney;
  */
 class MySQLiAdapter implements DBAdapter
 {
+    use Injectable;
+
     /**
      * @var mysqli
      */

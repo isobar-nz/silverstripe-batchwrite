@@ -18,18 +18,18 @@ class BatchWriteManyManyTest extends BaseTest
      */
     public function testWriteManyMany_CreateParentAndChildren_WritesManyMany()
     {
-        $parent = new Batman();
+        $parent = Batman::create();
         $parent->Name = 'Bruce Wayne';
         $parent->Car = 'Bat mobile';
 
         $children = [];
         for ($i = 0; $i < 5; $i++) {
-            $child = new Child();
             $child->Name = 'Soldier #' . $i;
+            $child = Child::create();
             $children[] = $child;
         }
 
-        $batch = new Batch();
+        $batch = Batch::create();
 
         $batch->write([$parent]);
         $batch->write($children);

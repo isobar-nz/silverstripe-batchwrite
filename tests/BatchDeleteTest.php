@@ -23,11 +23,11 @@ class BatchDeleteTest extends BaseTest
     {
         $objects = [];
         for ($i = 0; $i < 100; $i++) {
-            $human = new Human();
+            $human = Human::create();
             $human->Name = 'Proud Owner ' . $i;
             $human->write();
 
-            $dog = new Dog();
+            $dog = Dog::create();
             $dog->Name = 'Pup ' . $i;
             $dog->Color = 'Fifty Shade No. ' . $i;
             $dog->OwnerID = $human->ID;
@@ -37,7 +37,7 @@ class BatchDeleteTest extends BaseTest
             $objects[] = $dog;
         }
 
-        $batch = new Batch();
+        $batch = Batch::create();
         $batch->delete($objects);
 
         $this->assertEquals(0, Dog::get()->Count());
@@ -50,19 +50,17 @@ class BatchDeleteTest extends BaseTest
      */
     public function testBranchDeleteIDs_DeleteManyIDs_ObjectsDeleted()
     {
-        $className = '';
         $ids = [];
         for ($i = 0; $i < 100; $i++) {
-            $dog = new Dog();
+            $dog = Dog::create();
             $dog->Name = 'Pup ' . $i;
             $dog->Color = 'Fifty Shade No. ' . $i;
             $dog->write();
-            $className = $dog->ClassName;
             $ids[] = $dog->ID;
         }
 
-        $batch = new Batch();
-        $batch->deleteIDs($className, $ids);
+        $batch = Batch::create();
+        $batch->deleteIDs(Dog::class, $ids);
 
         $this->assertEquals(0, Dog::get()->Count());
     }
@@ -74,14 +72,14 @@ class BatchDeleteTest extends BaseTest
     {
         $pages = [];
         for ($i = 0; $i < 100; $i++) {
-            $page = new DogPage();
             $page->Title = 'Hero Dog ' . $i;
+            $page = DogPage::create();
             $page->writeToStage(Versioned::DRAFT);
             $page->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
             $pages[] = $page;
         }
 
-        $batch = new Batch();
+        $batch = Batch::create();
 
         Versioned::withVersionedMode(function () use ($batch, $pages) {
             Versioned::set_stage(Versioned::LIVE);

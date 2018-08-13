@@ -18,10 +18,10 @@ class WriteCallbackTest extends BaseTest
      */
     public function testCallback_SetOnAfterWriteCallback_CallbackCalled()
     {
-        $dog = new Dog();
+        $dog = Dog::create();
         $dog->Name = 'Jim bob';
 
-        $owner = new Human();
+        $owner = Human::create();
         $owner->Name = 'Hilly Stewart';
 
         $owner->onAfterWriteCallback(function ($owner) use ($dog) {
@@ -44,10 +44,10 @@ class WriteCallbackTest extends BaseTest
      */
     public function testCallback_SetOnBeforeWriteCallback_CallbackCalled()
     {
-        $dog = new Dog();
+        $dog = Dog::create();
         $dog->Name = 'Jim bob';
 
-        $owner = new Human();
+        $owner = Human::create();
         $owner->Name = 'Hilly Stewart';
         $owner->write();
 
@@ -70,13 +70,13 @@ class WriteCallbackTest extends BaseTest
      */
     public function testCallback_SetOnAfterExistsCallback_CallbackCalled()
     {
-        $dog1 = new Dog();
+        $dog1 = Dog::create();
         $dog1->Name = 'Jim bob';
 
-        $dog2 = new Dog();
+        $dog2 = Dog::create();
         $dog2->Name = 'Super Dog';
 
-        $owner = new Human();
+        $owner = Human::create();
         $owner->Name = 'Hilly Stewart';
         $owner->write();
 

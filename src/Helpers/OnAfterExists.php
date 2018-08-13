@@ -4,6 +4,7 @@ namespace LittleGiant\BatchWrite\Helpers;
 
 use ArrayObject;
 use ReflectionProperty;
+use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\DataObject;
 
 /**
@@ -11,6 +12,8 @@ use SilverStripe\ORM\DataObject;
  */
 class OnAfterExists
 {
+    use Injectable;
+
     /**
      * @var ArrayObject
      */
