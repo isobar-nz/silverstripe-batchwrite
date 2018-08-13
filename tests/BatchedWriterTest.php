@@ -2,8 +2,8 @@
 
 namespace LittleGiant\BatchWrite\Tests;
 
-use LittleGiant\BatchWrite\Helpers\BatchedWriter;
-use LittleGiant\BatchWrite\Helpers\OnAfterExists;
+use LittleGiant\BatchWrite\BatchedWriter;
+use LittleGiant\BatchWrite\OnAfterExists;
 use LittleGiant\BatchWrite\Tests\DataObjects\Cat;
 use LittleGiant\BatchWrite\Tests\DataObjects\Child;
 use LittleGiant\BatchWrite\Tests\DataObjects\Dog;

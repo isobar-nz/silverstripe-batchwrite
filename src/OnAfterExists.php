@@ -1,6 +1,6 @@
 <?php
 
-namespace LittleGiant\BatchWrite\Helpers;
+namespace LittleGiant\BatchWrite;
 
 use ArrayObject;
 use ReflectionProperty;
@@ -9,6 +9,7 @@ use SilverStripe\ORM\DataObject;
 
 /**
  * Class OnAfterExists
+ * @package LittleGiant\BatchWrite
  */
 class OnAfterExists
 {

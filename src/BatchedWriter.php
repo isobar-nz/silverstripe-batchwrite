@@ -1,6 +1,6 @@
 <?php
 
-namespace LittleGiant\BatchWrite\Helpers;
+namespace LittleGiant\BatchWrite;
 
 use ReflectionProperty;
 use SilverStripe\Core\Injector\Injectable;
@@ -8,6 +8,7 @@ use SilverStripe\ORM\DataObject;
 
 /**
  * Class BatchedWriter
+ * @package LittleGiant\BatchWrite
  */
 class BatchedWriter
 {

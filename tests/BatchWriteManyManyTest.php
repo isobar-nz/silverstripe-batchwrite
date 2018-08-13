@@ -2,7 +2,7 @@
 
 namespace LittleGiant\BatchWrite\Tests;
 
-use LittleGiant\BatchWrite\Helpers\Batch;
+use LittleGiant\BatchWrite\Batch;
 use LittleGiant\BatchWrite\Tests\DataObjects\Batman;
 use LittleGiant\BatchWrite\Tests\DataObjects\Child;
 use LittleGiant\BatchWrite\Tests\DataObjects\Human;

@@ -1,11 +1,12 @@
 <?php
 
-namespace LittleGiant\BatchWrite\Helpers;
+namespace LittleGiant\BatchWrite;
 
 use Exception;
 use LittleGiant\BatchWrite\Adapters\DBAdapter;
 use LittleGiant\BatchWrite\Adapters\MySQLiAdapter;
 use LittleGiant\BatchWrite\Adapters\PDOAdapter;
+use LittleGiant\BatchWrite\Helpers\RuntimeException;
 use ReflectionMethod;
 use ReflectionProperty;
 use SilverStripe\Core\Injector\Injectable;
@@ -20,7 +21,7 @@ use SilverStripe\Versioned\Versioned;
 
 /**
  * Class Batch
- * @package LittleGiant\BatchWrite\Helpers
+ * @package LittleGiant\BatchWrite
  */
 class Batch
 {
