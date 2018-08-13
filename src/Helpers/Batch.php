@@ -3,13 +3,11 @@
 namespace LittleGiant\BatchWrite\Helpers;
 
 use Exception;
-use http\Exception\RuntimeException;
 use LittleGiant\BatchWrite\Adapters\DBAdapter;
 use LittleGiant\BatchWrite\Adapters\MySQLiAdapter;
 use LittleGiant\BatchWrite\Adapters\PDOAdapter;
 use ReflectionMethod;
 use ReflectionProperty;
-use SilverStripe\Core\ClassInfo;
 use SilverStripe\Core\Injector\Injectable;
 use SilverStripe\ORM\Connect\MySQLDatabase;
 use SilverStripe\ORM\Connect\MySQLiConnector;
@@ -17,32 +15,31 @@ use SilverStripe\ORM\Connect\PDOConnector;
 use SilverStripe\ORM\DataList;
 use SilverStripe\ORM\DataObject;
 use SilverStripe\ORM\DB;
-use SilverStripe\ORM\FieldType\DBField;
 use SilverStripe\ORM\FieldType\DBInt;
 use SilverStripe\Versioned\Versioned;
 
 /**
  * Class Batch
+ * @package LittleGiant\BatchWrite\Helpers
  */
 class Batch
 {
     use Injectable;
 
     /**
-     * @var array
-     */
-    private $relations = array();
-
-    /**
-     * @var MySQLiAdapter|PDOAdapter
-     */
-    private $adapter;
-
-    /**
-     *
      * @var int @@auto_increment_increment for the MySQL server
      */
-    private static $autoIncrementIncrement;
+    protected static $autoIncrementIncrement = null;
+
+    /**
+     * @var array
+     */
+    private $relations = [];
+
+    /**
+     * @var DBAdapter
+     */
+    private $adapter;
 
     /**
      *
@@ -50,32 +47,30 @@ class Batch
     public function __construct()
     {
         $this->adapter = $this->getAdapter();
-        if(!isset(self::$autoIncrementIncrement)){
+
+        if (static::$autoIncrementIncrement === null) {
             $result = DB::query('SELECT @@auto_increment_increment as increment');
-            $row = $result->first();
-            self::$autoIncrementIncrement = intval($row['increment']);
+            static::$autoIncrementIncrement = intval($result->value());
         }
     }
 
     /**
      * @return DBAdapter
-     * @throws Exception
      */
     private function getAdapter()
     {
-        if (class_exists(MySQLiConnector::class) && class_exists(PDOConnector::class)) {
-            $connector = DB::get_connector();
-            if ($connector instanceof MySQLiConnector) {
-                $connProperty = new ReflectionProperty(MySQLiConnector::class, 'dbConn');
-                $connProperty->setAccessible(true);
-                $conn = $connProperty->getValue($connector);
-                return MySQLiAdapter::create($conn);
-            } else if ($connector instanceof PDOConnector) {
-                $connProperty = new ReflectionProperty(PDOConnector::class, 'pdoConnection');
-                $connProperty->setAccessible(true);
-                $conn = $connProperty->getValue($connector);
-                return PDOAdapter::create($conn);
-            }
+        $connector = DB::get_connector();
+
+        if ($connector instanceof MySQLiConnector) {
+            $connProperty = new ReflectionProperty(MySQLiConnector::class, 'dbConn');
+            $connProperty->setAccessible(true);
+            $conn = $connProperty->getValue($connector);
+            return MySQLiAdapter::create($conn);
+        } elseif ($connector instanceof PDOConnector) {
+            $connProperty = new ReflectionProperty(PDOConnector::class, 'pdoConnection');
+            $connProperty->setAccessible(true);
+            $conn = $connProperty->getValue($connector);
+            return PDOAdapter::create($conn);
         } else {
             $db = DB::get_conn();
             if ($db instanceof MySQLDatabase) {
@@ -86,17 +81,15 @@ class Batch
             }
         }
 
-        throw new Exception('connection cannot be found');
+        throw new \RuntimeException('connection cannot be found');
     }
 
     /**
-     * @param $dataObjects
+     * @param iterable|DataObject[] $dataObjects
      */
     public function write($dataObjects)
     {
-        if (empty($dataObjects)) {
-            return;
-        }
+        if (empty($dataObjects)) return;
 
         foreach ($dataObjects as $dataObject) {
             $onBeforeWriteMethod = new ReflectionMethod($dataObject, 'onBeforeWrite');
@@ -114,42 +107,17 @@ class Batch
     }
 
     /**
-     * @param $dataObjects
-     */
-    public function writeToStage($dataObjects)
-    {
-        if (empty($dataObjects)) {
-            return;
-        }
-
-        $stages = func_get_args();
-        array_shift($stages);
-
-        foreach ($dataObjects as $dataObject) {
-            $dataObject->onBeforeWrite();
-        }
-
-        foreach ($stages as $stage) {
-            $this->writeTablePostfix($dataObjects, $stage);
-        }
-
-        foreach ($dataObjects as $dataObject) {
-            $dataObject->onAfterWrite();
-        }
-    }
-
-    /**
-     * @param DataList|DataObject[] $dataObjects
+     * @param iterable|DataObject[] $dataObjects
      * @param string $postfix
      * @return mixed
      */
     private function writeTablePostfix($dataObjects, $postfix = '')
     {
-        if ($postfix === 'Stage') {
+        if ($postfix === Versioned::DRAFT) {
             $postfix = '';
         }
 
-        $types = array();
+        $types = [];
 
         $date = date('Y-m-d H:i:s');
         foreach ($dataObjects as $dataObject) {
@@ -202,16 +170,35 @@ class Batch
     }
 
     /**
+     * @param iterable|DataObject[] $dataObjects
+     * @param string[] $stages
+     */
+    public function writeToStage($dataObjects, ...$stages)
+    {
+        if (empty($dataObjects)) return;
+
+        foreach ($dataObjects as $dataObject) {
+            $dataObject->onBeforeWrite();
+        }
+
+        foreach ($stages as $stage) {
+            $this->writeTablePostfix($dataObjects, $stage);
+        }
+
+        foreach ($dataObjects as $dataObject) {
+            $dataObject->onAfterWrite();
+        }
+    }
+
+    /**
      * @param DataObject[][] $sets
      * @throws Exception
      */
     public function writeManyMany($sets)
     {
-        if (empty($sets)) {
-            return;
-        }
+        if (empty($sets)) return;
 
-        $types = array();
+        $types = [];
 
         foreach ($sets as $set) {
             $types[$set[0]->ClassName][$set[2]->ClassName][] = $set;
@@ -219,20 +206,18 @@ class Batch
 
         foreach ($types as $className => $belongs) {
             foreach ($belongs as $sets) {
-                if (empty($sets)) {
-                    continue;
-                }
+                if (empty($sets)) continue;
 
                 $relationFields = $this->getRelationFields($sets[0][0], $sets[0][1]);
 
                 $tableName = $relationFields[0];
-                $columns = array($relationFields[1], $relationFields[2]);
+                $columns = [$relationFields[1], $relationFields[2]];
 
 //                $extraFields = $object->many_many_ExtraFields($relation);
 
-                $inserts = array();
+                $inserts = [];
                 $insert = '(?,?)';
-                $params = array();
+                $params = [];
                 foreach ($sets as $set) {
                     $params[] = intval($set[0]->getField('ID'));
                     $params[] = intval($set[2]->getField('ID'));
@@ -281,7 +266,7 @@ class Batch
      */
     public function delete($dataObjects)
     {
-        $types = array();
+        $types = [];
 
         foreach ($dataObjects as $dataObject) {
             $types[$dataObject->ClassName][] = $dataObject->getField('ID');
@@ -293,57 +278,13 @@ class Batch
     }
 
     /**
-     * @param $className
-     * @param $ids
-     */
-    public function deleteIDs($className, $ids)
-    {
-        $this->deleteTablePostfix($className, $ids);
-    }
-
-    /**
-     * @param DataList|DataObject[] $dataObjects
-     */
-    public function deleteFromStage($dataObjects)
-    {
-        $stages = array_slice(func_get_args(), 1);
-
-        $types = array();
-
-        foreach ($dataObjects as $dataObject) {
-            $types[$dataObject->ClassName][] = $dataObject->getField('ID');
-        }
-
-        foreach ($types as $className => $ids) {
-            foreach ($stages as $stage) {
-                $this->deleteTablePostfix($className, $ids, $stage);
-            }
-        }
-    }
-
-    /**
-     * @param $className
-     * @param $ids
-     */
-    public function deleteIDsFromStage($className, $ids)
-    {
-        $stages = array_slice(func_get_args(), 2);
-
-        foreach ($stages as $stage) {
-            $this->deleteTablePostfix($className, $ids, $stage);
-        }
-    }
-
-    /**
-     * @param $className
-     * @param $ids
+     * @param string $className
+     * @param iterable|int[] $ids
      * @param string $postfix
      */
     private function deleteTablePostfix($className, $ids, $postfix = '')
     {
-        if (empty($ids)) {
-            return;
-        }
+        if (empty($ids)) return;
 
         $singleton = singleton($className);
         $dataObjectSchema = DataObject::getSchema();
@@ -362,6 +303,46 @@ class Batch
             $table = $dataObjectSchema->baseDataTable($class) . $postfix;
             $sql = "DELETE FROM `{$table}` WHERE ID IN {$ids}";
             DB::query($sql);
+        }
+    }
+
+    /**
+     * @param $className
+     * @param $ids
+     */
+    public function deleteIDs($className, $ids)
+    {
+        $this->deleteTablePostfix($className, $ids);
+    }
+
+    /**
+     * @param iterable|DataObject[] $dataObjects
+     * @param string[] $stages
+     */
+    public function deleteFromStage($dataObjects, ...$stages)
+    {
+        $types = [];
+
+        foreach ($dataObjects as $dataObject) {
+            $types[$dataObject->ClassName][] = $dataObject->getField('ID');
+        }
+
+        foreach ($types as $className => $ids) {
+            foreach ($stages as $stage) {
+                $this->deleteTablePostfix($className, $ids, $stage);
+            }
+        }
+    }
+
+    /**
+     * @param string $className
+     * @param iterable|int[] $ids
+     * @param string[] $stages
+     */
+    public function deleteIDsFromStage($className, $ids, ...$stages)
+    {
+        foreach ($stages as $stage) {
+            $this->deleteTablePostfix($className, $ids, $stage);
         }
     }
 }
