@@ -41,9 +41,9 @@ class BatchWriteTest extends BaseTest
         $animals = [];
 
         for ($i = 0; $i < 100; $i++) {
-            $animal->Name = 'Bob ' . $i;
-            $animal->Country = 'Africa ' . $i;
             $animal = Animal::create();
+            $animal->Name = "Bob {$i}";
+            $animal->Country = "Africa {$i}";
             $animals[] = $animal;
         }
 
@@ -66,11 +66,11 @@ class BatchWriteTest extends BaseTest
         $dogs = [];
 
         for ($i = 0; $i < 100; $i++) {
-            $dog->Name = 'Bob ' . $i;
-            $dog->Country = 'Africa ' . $i;
-            $dog->Type = 'Woof Dog ' . $i;
-            $dog->Color = 'Brown #' . $i;
             $dog = Dog::create();
+            $dog->Name = "Bob {$i}";
+            $dog->Country = "Africa {$i}";
+            $dog->Type = "Woof Dog {$i}";
+            $dog->Color = "Brown #{$i}";
             $dogs[] = $dog;
         }
 
@@ -86,8 +86,8 @@ class BatchWriteTest extends BaseTest
         $this->assertEquals(100, Dog::get()->count());
 
         foreach (Animal::get() as $i => $dog) {
-            $this->assertEquals('Bob ' . $i, $dog->Name);
-            $this->assertEquals('Brown #' . $i, $dog->Color);
+            $this->assertEquals("Bob {$i}", $dog->Name);
+            $this->assertEquals("Brown #{$i}", $dog->Color);
         }
     }
 

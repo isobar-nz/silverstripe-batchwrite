@@ -24,12 +24,12 @@ class BatchDeleteTest extends BaseTest
         $objects = [];
         for ($i = 0; $i < 100; $i++) {
             $human = Human::create();
-            $human->Name = 'Proud Owner ' . $i;
+            $human->Name = "Proud Owner {$i}";
             $human->write();
 
             $dog = Dog::create();
-            $dog->Name = 'Pup ' . $i;
-            $dog->Color = 'Fifty Shade No. ' . $i;
+            $dog->Name = "Pup {$i}";
+            $dog->Color = "Fifty Shade No. {$i}";
             $dog->OwnerID = $human->ID;
             $dog->write();
 
@@ -53,8 +53,8 @@ class BatchDeleteTest extends BaseTest
         $ids = [];
         for ($i = 0; $i < 100; $i++) {
             $dog = Dog::create();
-            $dog->Name = 'Pup ' . $i;
-            $dog->Color = 'Fifty Shade No. ' . $i;
+            $dog->Name = "Pup {$i}";
+            $dog->Color = "Fifty Shade No. {$i}";
             $dog->write();
             $ids[] = $dog->ID;
         }
@@ -72,8 +72,8 @@ class BatchDeleteTest extends BaseTest
     {
         $pages = [];
         for ($i = 0; $i < 100; $i++) {
-            $page->Title = 'Hero Dog ' . $i;
             $page = DogPage::create();
+            $page->Title = "Hero Dog {$i}";
             $page->writeToStage(Versioned::DRAFT);
             $page->copyVersionToStage(Versioned::DRAFT, Versioned::LIVE);
             $pages[] = $page;

@@ -65,17 +65,17 @@ class OnAfterExistsTest extends BaseTest
         });
 
         $afterExists->addCondition($owner1, function ($owner) use ($dog) {
-            $dog->Name .= ' ' . $owner->Name;
+            $dog->Name .= " {$owner->Name}";
             $dog->OwnerID = $owner->ID;
         });
 
         $afterExists->addCondition($owner2, function ($owner) use ($dog) {
-            $dog->Name .= ' ' . $owner->Name;
+            $dog->Name .= " {$owner->Name}";
             $dog->OwnerID = $owner->ID;
         });
 
         $afterExists->addCondition($cat, function ($cat) use ($dog) {
-            $dog->Name .= ' ' . $cat->Name;
+            $dog->Name .= " {$cat->Name}";
         });
 
         $owner1->write();
@@ -103,8 +103,8 @@ class OnAfterExistsTest extends BaseTest
 
         $children = [];
         for ($i = 0; $i < 5; $i++) {
-            $child->Name = 'Soldier #' . $i;
             $child = Child::create();
+            $child->Name = "Soldier #{$i}";
             $children[] = $child;
         }
 

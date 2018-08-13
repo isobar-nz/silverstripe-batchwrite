@@ -32,14 +32,14 @@ class BatchedWriterTest extends BaseTest
             $writer = BatchedWriter::create($size);
 
             for ($i = 0; $i < 100; $i++) {
-                $owner->Name = 'Human ' . $i;
                 $owner = Human::create();
+                $owner->Name = "Human {$i}";
 
-                $dog->Name = 'Dog ' . $i;
                 $dog = Dog::create();
+                $dog->Name = "Dog {$i}";
 
-                $cat->Name = 'Cat ' . $i;
                 $cat = Cat::create();
+                $cat->Name = "Cat {$i}";
 
                 $owner->onAfterExistsCallback(function (Human $owner) use ($dog, $writer) {
                     $dog->OwnerID = $owner->ID;
@@ -103,8 +103,8 @@ class BatchedWriterTest extends BaseTest
 
         $children = [];
         for ($i = 0; $i < 5; $i++) {
-            $child->Name = 'Soldier #' . $i;
             $child = Child::create();
+            $child->Name = "Soldier #{$i}";
             $children[] = $child;
         }
 
@@ -138,8 +138,8 @@ class BatchedWriterTest extends BaseTest
 
             $pages = [];
             for ($i = 0; $i < 100; $i++) {
-                $page->Title = 'Wonder Pup  ' . $i;
                 $page = DogPage::create();
+                $page->Title = "Wonder Pup {$i}";
                 $pages[] = $page;
             }
 
