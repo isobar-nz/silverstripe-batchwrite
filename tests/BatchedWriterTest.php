@@ -108,6 +108,9 @@ class BatchedWriterTest extends BaseTest
             $children[] = $child;
         }
 
+        $this->assertCount(0, Human::get());
+        $this->assertCount(0, Child::get());
+
         $writer = BatchedWriter::create();
 
         $afterExists = OnAfterExists::create(function () use ($writer, $parent, $children) {

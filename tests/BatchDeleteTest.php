@@ -37,6 +37,9 @@ class BatchDeleteTest extends BaseTest
             $objects[] = $dog;
         }
 
+        $this->assertCount(100, Dog::get());
+        $this->assertCount(100, Human::get());
+
         $batch = Batch::create();
         $batch->delete($objects);
 
@@ -58,6 +61,8 @@ class BatchDeleteTest extends BaseTest
             $dog->write();
             $ids[] = $dog->ID;
         }
+
+        $this->assertCount(100, Dog::get());
 
         $batch = Batch::create();
         $batch->deleteIDs(Dog::class, $ids);
