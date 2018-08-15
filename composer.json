@@ -39,5 +39,6 @@
         "psr-4": {
             "LittleGiant\\BatchWrite\\Tests\\": "tests/"
         }
-    }
+    },
+    "prefer-stable": true
 }
