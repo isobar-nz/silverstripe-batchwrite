@@ -48,5 +48,6 @@ crashlytics.properties
 crashlytics-build.properties
 
 .env
+composer.lock
 vendor/
 resources/
