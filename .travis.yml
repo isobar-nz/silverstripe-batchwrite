@@ -1,21 +1,26 @@
 language: php
 php:
- - 5.4
- - 5.5
- - 5.6
+- 5.6
+- 7.0
+- 7.1
+- 7.2
 
 env:
- matrix:
-   - DB=MYSQL CORE_RELEASE=3.1
-   - DB=MYSQL CORE_RELEASE=3.2
+  global:
+  - SS_ENVIRONMENT_TYPE=test
+  - SS_DATABASE_SERVER=127.0.0.1
+  - SS_DATABASE_USERNAME=root
+  - SS_DATABASE_PASSWORD=""
+  - SS_DATABASE_NAME=batchwrite_ci
+
+  matrix:
+  - DB=MYSQL CORE_RELEASE=3.1
+  - DB=MYSQL CORE_RELEASE=3.2
 
 before_script:
- - phpenv rehash
- - composer self-update
- - git clone git://github.com/silverstripe-labs/silverstripe-travis-support.git ~/travis-support
- - php ~/travis-support/travis_setup.php --source `pwd` --target ~/builds/ss
- - cd ~/builds/ss
+- phpenv rehash
+- composer self-update
+- composer install
 
 script:
- - vendor/bin/phpunit silverstripe-batchwrite/tests/
-
+- vendor/bin/phpunit tests/

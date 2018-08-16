@@ -1,16 +1,23 @@
 <?php
 
-namespace BatchWrite;
+namespace LittleGiant\BatchWrite\Adapters;
 
-use DataObject;
+use LittleGiant\BatchWrite\Batch;
 use PDO;
+use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBDecimal;
+use SilverStripe\ORM\FieldType\DBFloat;
+use SilverStripe\ORM\FieldType\DBInt;
 
 /**
  * Class PDOAdapter
- * @package BatchWrite
+ * @package LittleGiant\BatchWrite\Adapters
  */
 class PDOAdapter implements DBAdapter
 {
+    use Injectable;
+
     /**
      * @var PDO
      */
@@ -26,9 +33,7 @@ class PDOAdapter implements DBAdapter
     }
 
     /**
-     * @param $sql
-     * @param $params
-     * @return bool
+     * @inheritdoc
      */
     public function query($sql, $params)
     {
@@ -38,42 +43,25 @@ class PDOAdapter implements DBAdapter
     }
 
     /**
-     * @param $className
-     * @param $objects
-     * @param bool|false $setID
-     * @param bool|false $isUpdate
-     * @param string $tablePostfix
-     * @return bool
+     * @inheritdoc
      */
     public function insertClass($className, $objects, $setID = false, $isUpdate = false, $tablePostfix = '')
     {
-        $fields = DataObject::database_fields($className);
-        $singleton = singleton($className);
+        $dataObjectSchema = DataObject::getSchema();
+        $fields = $dataObjectSchema->databaseFields($className, false);
 
-        $fields = array_filter(array_keys($fields), function ($field) use ($singleton) {
-            return $singleton->hasOwnTableDatabaseField($field);
-        });
-
-        // if setting ID then add to fields
-        if ($setID || $isUpdate) {
-            array_unshift($fields, 'ID');
-        }
-
-        $fieldObjects = array();
-        foreach ($fields as $field) {
-            $fieldObjects[$field] = $singleton->dbObject($field);
+        if (!$setID && !$isUpdate) {
+            unset($fields['ID']);
         }
 
         $params = array();
         foreach ($objects as $object) {
-            foreach ($fields as $field) {
+            foreach ($fields as $field => $type) {
                 $value = $object->getField($field);
                 // need to fill in null values with appropriate values
                 // TODO is there a better way to figure out if a value needs to be filled in?
                 if ($value === null) {
-                    if ($fieldObjects[$field] instanceof \Int ||
-                        $fieldObjects[$field] instanceof \Decimal ||
-                        $fieldObjects[$field] instanceof \Float) {
+                    if ($type === DBInt::class || $type === DBDecimal::class || $type === DBFloat::class) {
                         $value = 0;
                     } else {
                         $value = '';
@@ -83,13 +71,12 @@ class PDOAdapter implements DBAdapter
             }
         }
 
-        // ClassName or ClassName_Live
-        $tableName = $className . ($tablePostfix ? '_' . $tablePostfix : '');
+        $fields = array_keys($fields);
+        $tablePostfix = Batch::getStageTableSuffix($tablePostfix);
+        $tableName = $dataObjectSchema->tableName($className) . $tablePostfix;
 
         //  (`Field1`, `Field2`, ...)
-        $fieldSQL = implode(', ', array_map(function ($field) {
-            return "`{$field}`";
-        }, $fields));
+        $fieldSQL = '`' . implode('`,`', $fields) . '`';
 
         // (?, ?, ?, ?), (?, ...), ....
         $inserts = implode(',', array_fill(0, count($objects), '(' . implode(',', array_fill(0, count($fields), '?')) . ')'));
@@ -111,9 +98,7 @@ class PDOAdapter implements DBAdapter
     }
 
     /**
-     * @param $sql
-     * @param $params
-     * @return mixed
+     * @inheritdoc
      */
     public function insertManyMany($sql, $params)
     {

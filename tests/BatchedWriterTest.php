@@ -1,75 +1,52 @@
 <?php
 
-namespace BatchWrite\Tests;
+namespace LittleGiant\BatchWrite\Tests;
+
+use LittleGiant\BatchWrite\BatchedWriter;
+use LittleGiant\BatchWrite\OnAfterExists;
+use LittleGiant\BatchWrite\Tests\DataObjects\Cat;
+use LittleGiant\BatchWrite\Tests\DataObjects\Child;
+use LittleGiant\BatchWrite\Tests\DataObjects\Dog;
+use LittleGiant\BatchWrite\Tests\DataObjects\DogPage;
+use LittleGiant\BatchWrite\Tests\DataObjects\Human;
+use SilverStripe\Versioned\Versioned;
 
 /**
  * Class BatchedWriterTest
- * @package BatchWrite\Tests
+ * @package LittleGiant\BatchWrite\Tests
  */
-/**
- * Class BatchedWriterTest
- * @package BatchWrite\Tests
- */
-class BatchedWriterTest extends \SapphireTest
+class BatchedWriterTest extends BaseTest
 {
-    /**
-     * @var bool
-     */
-    protected $usesDatabase = true;
-
-    /**
-     * @var array
-     */
-    protected $extraDataObjects = array(
-        'BatchWrite\Tests\Animal',
-        'BatchWrite\Tests\Batman',
-        'BatchWrite\Tests\Cat',
-        'BatchWrite\Tests\Child',
-        'BatchWrite\Tests\Child',
-        'BatchWrite\Tests\Dog',
-        'BatchWrite\Tests\DogPage',
-        'BatchWrite\Tests\Human',
-    );
-
-    /**
-     * BatchedWriterTest constructor.
-     */
-    public function __construct()
-    {
-        $this->setUpOnce();
-    }
-
     /**
      *
      */
     public function testWrite_WriteObjects_ObjectsWritten()
     {
-        $batchSizes = array(10, 30, 100, 300);
+        $batchSizes = [10, 30, 100, 300];
 
         foreach ($batchSizes as $size) {
+            $owners = [];
+            $dogs = [];
+            $cats = [];
 
-            $owners = array();
-            $dogs = array();
-            $cats = array();
-
-            $writer = new \BatchedWriter($size);
+            $writer = BatchedWriter::create($size);
 
             for ($i = 0; $i < 100; $i++) {
-                $owner = new Human();
-                $owner->Name = 'Human ' . $i;
+                $owner = Human::create();
+                $owner->Name = $this->faker->name;
 
-                $dog = new Dog();
-                $dog->Name = 'Dog ' . $i;
+                $dog = Dog::create();
+                $dog->Name = $this->faker->firstName;
 
-                $cat = new Cat();
-                $cat->Name = 'Cat ' . $i;
+                $cat = Cat::create();
+                $cat->Name = $this->faker->firstName;
 
-                $owner->onAfterExistsCallback(function ($owner) use ($dog, $writer) {
+                $owner->onAfterExistsCallback(function (Human $owner) use ($dog, $writer) {
                     $dog->OwnerID = $owner->ID;
                     $writer->write($dog);
                 });
 
-                $dog->onAfterExistsCallback(function ($dog) use ($cat, $writer) {
+                $dog->onAfterExistsCallback(function (Dog $dog) use ($cat, $writer) {
                     $cat->EnemyID = $dog->ID;
                     $writer->write($cat);
                 });
@@ -92,9 +69,9 @@ class BatchedWriterTest extends \SapphireTest
             $dogs = Dog::get();
             $cats = Cat::get();
 
-            $this->assertEquals(100, $owners->Count());
-            $this->assertEquals(100, $dogs->Count());
-            $this->assertEquals(100, $cats->Count());
+            $this->assertCount(100, $owners);
+            $this->assertCount(100, $dogs);
+            $this->assertCount(100, $cats);
 
             for ($i = 0; $i < 100; $i++) {
                 $owner = $owners[$i];
@@ -110,9 +87,9 @@ class BatchedWriterTest extends \SapphireTest
             $writer->delete($cats);
             $writer->finish();
 
-            $this->assertEquals(0, Human::get()->Count());
-            $this->assertEquals(0, Dog::get()->Count());
-            $this->assertEquals(0, Cat::get()->Count());
+            $this->assertCount(0, Human::get());
+            $this->assertCount(0, Dog::get());
+            $this->assertCount(0, Cat::get());
         }
     }
 
@@ -121,31 +98,35 @@ class BatchedWriterTest extends \SapphireTest
      */
     public function testWriteManyMany_SetChildrenForParent_RelationWritten()
     {
-        $parent = new Human();
-        $parent->Name = 'Bob';
+        $parent = Human::create();
+        $parent->Name = $this->faker->name;
 
-        $children = array();
+        $children = [];
         for ($i = 0; $i < 5; $i++) {
-            $child = new Child();
-            $child->Name = 'Soldier #' . $i;
+            $child = Child::create();
+            $child->Name = $this->faker->name;
             $children[] = $child;
         }
 
-        $writer = new \BatchedWriter();
+        $this->assertCount(0, Human::get());
+        $this->assertCount(0, Child::get());
 
-        $afterExists = new \OnAfterExists(function () use($writer, $parent, $children) {
+        $writer = BatchedWriter::create();
+
+        $afterExists = OnAfterExists::create(function () use ($writer, $parent, $children) {
             $writer->writeManyMany($parent, 'Children', $children);
         });
 
         $afterExists->addCondition($parent);
         $afterExists->addCondition($children);
 
-        $writer->write(array($parent));
+        $writer->write([$parent]);
         $writer->write($children);
         $writer->finish();
 
+        /** @var Human $parent */
         $parent = Human::get()->first();
-        $this->assertEquals(5, $parent->Children()->Count());
+        $this->assertCount(5, $parent->Children());
     }
 
     /**
@@ -153,47 +134,40 @@ class BatchedWriterTest extends \SapphireTest
      */
     public function testWriteToStages_ManyPages_WritesObjectsToStage()
     {
-        $sizes = array(10, 30, 100, 300);
+        $sizes = [10, 30, 100, 300];
 
         foreach ($sizes as $size) {
-            $writer = new \BatchedWriter($size);
+            $writer = BatchedWriter::create($size);
 
-            $pages = array();
+            $pages = [];
             for ($i = 0; $i < 100; $i++) {
-                $page = new DogPage();
-                $page->Title = 'Wonder Pup  '. $i;
+                $page = DogPage::create();
+                $page->Title = "Wonder Pup {$i}";
                 $pages[] = $page;
             }
 
-            $writer->writeToStage($pages, 'Stage');
+            $writer->writeToStage($pages, Versioned::DRAFT);
             $writer->finish();
 
-            $currentStage = \Versioned::current_stage();
+            Versioned::withVersionedMode(function () {
+                Versioned::set_stage(Versioned::DRAFT);
+                $this->assertCount(100, DogPage::get());
+            });
 
-            \Versioned::reading_stage('Stage');
-            $this->assertEquals(100, DogPage::get()->Count());
+            Versioned::withVersionedMode(function () use ($writer, $pages) {
+                Versioned::set_stage(Versioned::LIVE);
+                $this->assertCount(0, DogPage::get());
 
-            \Versioned::reading_stage('Live');
-            $this->assertEquals(0, DogPage::get()->Count());
+                $writer->writeToStage($pages, Versioned::LIVE);
+                $writer->finish();
 
-            $writer->writeToStage($pages, 'Live');
+                $this->assertCount(100, DogPage::get());
+            });
+
+            $writer->deleteFromStage($pages, Versioned::DRAFT, Versioned::LIVE);
             $writer->finish();
 
-            \Versioned::reading_stage('Live');
-            $this->assertEquals(100, DogPage::get()->Count());
-
-            \Versioned::reading_stage($currentStage);
-
-            $writer->deleteFromStage($pages, 'Stage', 'Live');
-            $writer->finish();
-
-            $this->assertEquals(0, DogPage::get()->Count());
+            $this->assertCount(0, DogPage::get());
         }
     }
-
-//    public static function tearDownAfterClass()
-//    {
-//        parent::tearDownAfterClass();
-//        \SapphireTest::delete_all_temp_dbs();
-//    }
 }

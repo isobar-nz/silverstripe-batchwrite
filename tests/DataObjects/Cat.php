@@ -1,12 +1,23 @@
 <?php
 
-namespace BatchWrite\Tests;
+namespace LittleGiant\BatchWrite\Tests\DataObjects;
+
+use LittleGiant\BatchWrite\Extensions\WriteCallbackExtension;
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBVarchar;
 
 /**
  * Class Cat
+ *
  * @package BatchWrite\Tests
+ * @property string $Type
+ * @property bool $HasClaws
+ * @property int $EnemyID
+ * @method Dog|null Enemy()
+ * @mixin WriteCallbackExtension
  */
-class Cat extends Animal implements \TestOnly
+class Cat extends Animal implements TestOnly
 {
     /**
      * @var bool
@@ -21,17 +32,17 @@ class Cat extends Animal implements \TestOnly
     /**
      * @var array
      */
-    public static $db = array(
-        'Type' => 'Varchar',
-        'HasClaws' => 'Boolean',
-    );
+    private static $db = [
+        'Type'     => DBVarchar::class,
+        'HasClaws' => DBBoolean::class,
+    ];
 
     /**
      * @var array
      */
-    public static $has_one = array(
-        'Enemy' => 'BatchWrite\Tests\Dog',
-    );
+    private static $has_one = [
+        'Enemy' => Dog::class,
+    ];
 
     /**
      *

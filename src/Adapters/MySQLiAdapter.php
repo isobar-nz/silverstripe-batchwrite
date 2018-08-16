@@ -1,21 +1,26 @@
 <?php
 
-namespace BatchWrite;
+namespace LittleGiant\BatchWrite\Adapters;
 
-use Boolean;
-use DataObject;
-use Decimal;
 use Exception;
-use Float;
-use Int;
+use LittleGiant\BatchWrite\Batch;
 use mysqli;
+use SilverStripe\Core\Injector\Injectable;
+use SilverStripe\ORM\DataObject;
+use SilverStripe\ORM\FieldType\DBBoolean;
+use SilverStripe\ORM\FieldType\DBDecimal;
+use SilverStripe\ORM\FieldType\DBFloat;
+use SilverStripe\ORM\FieldType\DBInt;
+use SilverStripe\ORM\FieldType\DBMoney;
 
 /**
  * Class MySQLiAdapter
- * @package BatchWrite
+ * @package LittleGiant\BatchWrite\Adapters
  */
 class MySQLiAdapter implements DBAdapter
 {
+    use Injectable;
+
     /**
      * @var mysqli
      */
@@ -31,66 +36,47 @@ class MySQLiAdapter implements DBAdapter
     }
 
     /**
-     * @param $sql
-     * @param $params
-     * @throws Exception
-     * @return bool
+     * @inheritdoc
      */
     public function query($sql, $params)
     {
         $stmt = $this->conn->prepare($sql);
 
         if (!$stmt) {
-            throw new Exception('Invalid query: '. $sql);
+            throw new Exception("{$this->conn->error} in query {$sql}", $this->conn->errno);
         }
 
-        $refs = array();
-        foreach ($params as $key => $value) {
-            $refs[$key] = &$params[$key];
-        }
-
-        call_user_func_array(array($stmt, 'bind_param'), $refs);
-        $stmt->execute();
+        $stmt->bind_param(...$params);
+        return $stmt->execute();
     }
 
     /**
-     * @param $className
-     * @param $objects
-     * @param bool|false $setID
-     * @param bool|false $isUpdate
-     * @param string $tablePostfix
-     * @throws Exception
-     * @return bool
+     * @inheritdoc
      */
     public function insertClass($className, $objects, $setID = false, $isUpdate = false, $tablePostfix = '')
     {
-        $fields = DataObject::database_fields($className);
+        $dataObjectSchema = DataObject::getSchema();
+        $fields = $dataObjectSchema->databaseFields($className, false);
 
-        $singleton = singleton($className);
-
-        $fields = array_filter(array_keys($fields), function ($field) use ($singleton) {
-            return $singleton->hasOwnTableDatabaseField($field);
-        });
-
-        if ($setID || $isUpdate) {
-            array_unshift($fields, 'ID');
+        if (!$setID && !$isUpdate) {
+            unset($fields['ID']);
         }
 
         // types need to be set
         $typeLookup = array(
             'ID' => 'i',
         );
-        foreach ($fields as $field) {
-            $dbObject = $singleton->dbObject($field);
-            if ($dbObject instanceof Boolean || $dbObject instanceof Int) {
+        foreach ($fields as $field => $type) {
+            if ($type === DBBoolean::class || $type === DBInt::class) {
                 $typeLookup[$field] = 'i';
-            } else if ($dbObject instanceof Float || $dbObject instanceof Decimal || $dbObject instanceof Money) {
+            } else if ($type === DBFloat::class || $type === DBDecimal::class || $type === DBMoney::class) {
                 $typeLookup[$field] = 'd';
             } else {
                 $typeLookup[$field] = 's';
             }
         }
 
+        $fields = array_keys($fields);
         $typeString = '';
         $params = array();
         foreach ($objects as $obj) {
@@ -110,11 +96,9 @@ class MySQLiAdapter implements DBAdapter
         }
         array_unshift($params, $typeString);
 
-        $table = $className . ($tablePostfix ? '_' . $tablePostfix : '');
-
-        $columns = implode(', ', array_map(function ($name) {
-            return "`{$name}`";
-        }, $fields));
+        $tablePostfix = Batch::getStageTableSuffix($tablePostfix);
+        $table = $dataObjectSchema->tableName($className) . $tablePostfix;
+        $columns = '`' . implode('`,`', $fields) . '`';
 
         // inserts
         $inserts = implode(',', array_fill(0, count($objects), '(' . implode(',', array_fill(0, count($fields), '?')) . ')'));
@@ -131,13 +115,11 @@ class MySQLiAdapter implements DBAdapter
             $sql .= " ON DUPLICATE KEY UPDATE {$mappings}";
         }
 
-        $this->query($sql, $params);
+        return $this->query($sql, $params);
     }
 
     /**
-     * @param $sql
-     * @param $params
-     * @return mixed
+     * @inheritdoc
      */
     public function insertManyMany($sql, $params)
     {

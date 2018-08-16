@@ -1,21 +1,44 @@
 {
-  "name": "littlegiant/silverstripe-batchwrite",
-  "description": "Batch write for silverstripe data objects",
-  "type": "silverstripe-module",
-  "homepage": "http://github.com/Little-Giant/silverstripe-batchwrite",
-  "keywords": ["silverstripe", "batch", "performance"],
-  "license": "BSD-2-Clause",
-  "authors": [
-    {"name": "Little Giant","email": "webmaster@littlegiant.co.nz"}
-  ],
-  "support": {
-    "issues": "http://github.com/Little-Giant/silverstripe-seeder/issues"
-  },
-  "extra": {
-    "installer-name": "silverstripe-batchwrite"
-  },
-  "require": {
-    "silverstripe/framework": ">=3.0",
-    "silverstripe/cms": ">=3.0"
-  }
+    "name": "littlegiant/silverstripe-batchwrite",
+    "description": "Batch write for silverstripe data objects",
+    "type": "silverstripe-vendormodule",
+    "homepage": "http://github.com/Little-Giant/silverstripe-batchwrite",
+    "keywords": [
+        "silverstripe",
+        "batch",
+        "performance"
+    ],
+    "license": "BSD-2-Clause",
+    "authors": [
+        {
+            "name": "Little Giant",
+            "email": "webmaster@littlegiant.co.nz"
+        }
+    ],
+    "support": {
+        "issues": "http://github.com/Little-Giant/silverstripe-seeder/issues"
+    },
+    "extra": {
+        "installer-name": "silverstripe-batchwrite"
+    },
+    "require": {
+        "php": ">=5.6",
+        "silverstripe/framework": "^4.0"
+    },
+    "require-dev": {
+        "silverstripe/versioned": "^1",
+        "phpunit/phpunit": "^5.7",
+        "fzaninotto/faker": "^1.8"
+    },
+    "autoload": {
+        "psr-4": {
+            "LittleGiant\\BatchWrite\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "LittleGiant\\BatchWrite\\Tests\\": "tests/"
+        }
+    },
+    "prefer-stable": true
 }

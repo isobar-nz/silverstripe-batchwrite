@@ -1,17 +1,24 @@
 <?php
 
-namespace BatchWrite\Tests;
+namespace LittleGiant\BatchWrite\Tests\DataObjects;
+
+use LittleGiant\BatchWrite\Extensions\WriteCallbackExtension;
+use SilverStripe\Dev\TestOnly;
+use SilverStripe\ORM\FieldType\DBVarchar;
 
 /**
  * Class Batman
+ *
  * @package BatchWrite\Tests
+ * @property string $Car
+ * @mixin WriteCallbackExtension
  */
-class Batman extends Human implements \TestOnly
+class Batman extends Human implements TestOnly
 {
     /**
      * @var array
      */
-    public static $db = array(
-        'Car' => 'Varchar',
-    );
+    private static $db = [
+        'Car' => DBVarchar::class,
+    ];
 }
